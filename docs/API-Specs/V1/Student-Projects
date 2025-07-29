@@ -1,0 +1,62 @@
+# Student Project API Specification
+
+This document outlines all API endpoints for Create, Read, Update, and Delete (CRUD) operations that may be performed on student project postings.
+
+## What should a user be able to do?
+
+1. All Users should be able to search for projects by their attributes
+1. A Student Creates a New Project, they are the project owner
+1. Project owner should be able to give the project a title
+1. Project owner should be able to add / remove contributors.
+1. All contributors should be able to add and remove skill tags
+1. All contributors should be able update a projects description
+1. All contributors should be able upload images / specify external images.
+1. All contributors should be able to add, update, or remove external links. 
+1. All contributors should be able add, update, or remove project question prompts.
+1. Project Owner should be able to set which course / group the project was for.
+1. Project Owner should be able to delete the project.
+1. All users able to read project title, description, collaborators, skill tags, images, links, and group.
+
+## API Endpoints
+
+### Project Search `GET` `/api/v1/project`
+
+### Project Creation: `POST` `/api/v1/project/`
+
+### Full Project Read: `GET` `/api/v1/project/[project_id]`
+
+### Project Delete: `DELETE` `/api/v1/project/[project_id]`
+
+### Set Project Title `PUT` `/api/v1/project/[project_id]/title`
+
+### Add Contributor `POST` `/api/v1/project/[project_id]/contributor`
+
+### Update Contributor `PUT` `/api/v1/project/[project_id]/contributor/[contributor_id]`
+
+### Delete Contributor `DELETE` `/api/v1/project/[project_id]/contributor/[contributor_id]`
+
+### Add Skill Tag `POST` `/api/v1/project/[project_id]/skill-tag`
+
+### Remove Skill Tag `DELETE` `/api/v1/project/[project_id]/skill-tag/[tag_id]`
+
+### Update Description `PUT` `/api/v1/project/[project_id]/description`
+
+### Serve Image `GET` `/api/v1/project/[project_id]/image/[image_id]`
+
+### Add Image `POST` `/api/v1/project/[project_id]/image`
+
+### Remove Image `DELETE` `/api/v1/project/[project_id]/image/[image_id]`
+
+### Add Link `POST` `/api/v1/project/[project_id]/link`
+
+### Update Link `PUT` `/api/v1/project/[project_id]/link/[link_id]`
+
+### Delete Link `DELETE` `/api/v1/project/[project_id]/link/[link_id]`
+
+### Add Question `POST` `/api/v1/project/[project_id]/question`
+
+### Update Question `PUT` `/api/v1/project/[project_id]/question/[question_id]`
+
+### Delete Question `DELETE` `/api/v1/project/[project_id]/question/[question_id]`
+
+### Set Course / Group `PUT` `/api/v1/project/[project_id]/course`
