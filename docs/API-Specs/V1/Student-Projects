@@ -21,10 +21,47 @@ This document outlines all API endpoints for Create, Read, Update, and Delete (C
 
 ### Project Search `GET` `/api/v1/project`
 
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
+
 ### Project Creation: `POST` `/api/v1/project/`
 
 This project allows a user with a student role to create an empty student project. Only authenticated users with a
 student designation can create a project. The user that creates this project will be classified as the project owner.
+This project will be defined with draft visibility, so its only visible to owner and contributors.
 
 #### Request
 
@@ -70,14 +107,14 @@ Status
 
 ### Full Project Read: `GET` `/api/v1/project/[project_id]`
 
-Returns the all the information for a project. All users are allowed to call to this endpoint. Visibility rules may
-be applied in the future.
+Returns the all the information for a project. All users are allowed to call to this endpoint.
+If this project is marked as draft, then this will return 404 for all users except the owner and collaborator.
 
 #### Request
 
 Headers
 
-- `Authorization`: The session token for the user trying to read the post. This is optional for right now, but may become required as we implement visibility rules.
+- `Authorization`: The session token for the user trying to read the post. This is optional.
 
 Query Params:
 None
@@ -130,16 +167,15 @@ Body:
 Status:
 
 - 200: Project Fetched Successfully
-    - project will be fully populated
-- 404: The requested project was not found
-    - project will be undefined
+  - project will be fully populated
+- 404: The requested project was not found or the user did not have permission to access it
+  - project will be undefined
 - 500: Internal Server Error
-    - project will be undefined
-
+  - project will be undefined
 
 ### Project Delete: `DELETE` `/api/v1/project/[project_id]`
 
-Deletes the specified project. This can only be performed by the project owner. 
+Deletes the specified project. This can only be performed by the project owner.
 
 #### Request
 
@@ -163,15 +199,64 @@ Body:
 None
 
 Status:
+
 - 204: Project Deleted Successfully
 - 401: The authentication token was not provided or was invalid
 - 403: The user is not the owner of the project
 - 404: The requested project was not found
 - 500: Internal Server Error
 
+### Set Project Visibility `PUT` `/api/v1/project/[project_id]/visibility`
+
+Sets the project visibility. Only the owner of the project can call to this endpoint.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+
+```typescript
+{
+  visibility: "public" | "draft";
+}
+```
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{
+    visibility?: "public" | "draft"
+}
+```
+
+Status:
+
+- 200: Visibility Set Successfully
+  - `visibility` will be set to the updated visibility value
+- 400: Description
+  - `visibility` will be undefined
+- 401: Description
+  - `visibility` will be undefined
+- 403: Description
+  - `visibility` will be undefined
+- 500: Description
+  - `visibility` will be undefined
+
 ### Set Project Title `PUT` `/api/v1/project/[project_id]/title`
 
-Sets the title for the project. This can only be performed by the project owner. 
+Sets the title for the project. This can only be performed by the project owner.
 
 #### Request
 
@@ -183,9 +268,10 @@ Query Params:
 None
 
 Body:
+
 ```typescript
 {
-    newTitle: string
+  newTitle: string;
 }
 ```
 
@@ -196,6 +282,7 @@ Headers
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
     title?: string
@@ -203,21 +290,21 @@ Body:
 ```
 
 Status:
-- 200: Title Updated Successfully
-    - title value will reflect the new title
-- 401: The authentication token was not provided or was invalid
-    - title value will be undefined
-- 403: The user is not the owner of the project
-    - title value will be undefined
-- 404: The requested project was not found
-    - title value will be undefined
-- 500: Internal Server Error
-    - title value will be undefined
 
+- 200: Title Updated Successfully
+  - title value will reflect the new title
+- 401: The authentication token was not provided or was invalid
+  - title value will be undefined
+- 403: The user is not the owner of the project
+  - title value will be undefined
+- 404: The requested project was not found
+  - title value will be undefined
+- 500: Internal Server Error
+  - title value will be undefined
 
 ### Add Contributor `POST` `/api/v1/project/[project_id]/contributor`
 
-Adds a new contributor to the project. This can only be performed by the project owner. 
+Adds a new contributor to the project. This can only be performed by the project owner.
 
 #### Request
 
@@ -237,16 +324,17 @@ Headers:
 none
 
 Body:
+
 ```typescript
 {
     contributor_id?: string
 }
 ```
 
-
 Status:
+
 - 200: Contributor Updated Successfully
-    - Contributor id will be populated with the UUID for the contributor
+  - Contributor id will be populated with the UUID for the contributor
 - 401: The authentication token was not provided or was invalid
 - 403: The user is not the owner of the project
 - 404: The requested project was not found
@@ -254,7 +342,7 @@ Status:
 
 ### Update Contributor `PUT` `/api/v1/project/[project_id]/contributor/[contributor_id]`
 
-Updates the name and email of the specified contributor. This can only be performed by the project owner. 
+Updates the name and email of the specified contributor. This can only be performed by the project owner.
 
 #### Request
 
@@ -266,6 +354,7 @@ Query Params:
 None
 
 Body:
+
 ```typescript
 {
     name: string,
@@ -280,6 +369,7 @@ Headers
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
     name?: string,
@@ -288,20 +378,21 @@ Body:
 ```
 
 Status:
+
 - 200: Title Updated Successfully
-    - Name and email will be set to the new value
+  - Name and email will be set to the new value
 - 401: The authentication token was not provided or was invalid
-    - Name and Email value will be undefined
+  - Name and Email value will be undefined
 - 403: The user is not the owner of the project
-    - Name and Email value will be undefined
+  - Name and Email value will be undefined
 - 404: The requested project was not found
-    - Name and Email value will be undefined
+  - Name and Email value will be undefined
 - 500: Internal Server Error
-    - Name and Email value will be undefined
+  - Name and Email value will be undefined
 
 ### Delete Contributor `DELETE` `/api/v1/project/[project_id]/contributor/[contributor_id]`
 
-Removes a contributor from the project. This can only be performed by the project owner. 
+Removes a contributor from the project. This can only be performed by the project owner.
 
 #### Request
 
@@ -325,38 +416,579 @@ Body:
 None
 
 Status:
+
 - 204: Contributor was removed successfully
 - 401: The authentication token was not provided or was invalid
 - 403: The user is not the owner of the project
 - 404: The requested project was not found
 - 500: Internal Server Error
 
-### Add Skill Tag `POST` `/api/v1/project/[project_id]/skill-tag`
+### List All Existing Skill Tags `GET` `/api/v1/project/skill-tags/`
+
+Lists all the existing skill tags. Can be called by any student.
+
+#### Request
+
+Headers
+
+- `Authorization`: The session token for the user trying to list the skill tags.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+`Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{
+    tags?: {
+        tag_id: string,
+        skill: string,
+    }[]
+}
+```
+
+Status:
+
+- 200: Tags are listed in the body
+  - tags will be populated with all the existing tags.
+- 401: The authentication token was not provided or was invalid
+  - tags will be undefined
+- 403: The user is not a student
+  - tags will be undefined
+- 500: Internal Server Error
+  - tags will be undefined
+
+### Create New Skill Tag `POST` `/api/v1/project/skill-tags/`
+
+Creates a new skill tag on the database. This can only be called by students.
+
+#### Request
+
+Headers
+
+- `Authorization`: The session token for the user trying to create the skill tag.
+
+Query Params:
+None
+
+Body:
+
+```typescript
+{
+    skill: string,
+}
+```
+
+#### Response
+
+Headers:
+`Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{
+    tag?:{
+        tag_id: string,
+        skill: string,
+    }
+}
+```
+
+Status:
+
+- 200: Tag Added Successfully
+  - tags will be populated with all the existing tags.
+- 401: The authentication token was not provided or was invalid
+  - tags will be undefined
+- 403: The user is not a student
+  - tags will be undefined
+- 500: Internal Server Error
+  - tags will be undefined
+
+### Add Skill Tag to Project `POST` `/api/v1/project/[project_id]/skill-tag/[tag_id]`
+
+Adds a reference to a skill tag to the specified post. This can only be called by collaborators on the project.
+
+#### Request
+
+Headers
+
+- `Authorization`: The session token for the user trying to add the skill tag.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+`Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{
+    message?: string
+}
+```
+
+Status:
+
+- 200: Tag Added Successfully
+  - message will say "OK"
+- 401: The authentication token was not provided or was invalid
+  - message will be undefined
+- 403: The user is not a contributor on the project
+  - message will be undefined
+- 404: The requested project or skill tag was not found
+  - message will either say "Project Not Found", or "Skill Tag Not Found"
+- 500: Internal Server Error
+  - message will be undefined
 
 ### Remove Skill Tag `DELETE` `/api/v1/project/[project_id]/skill-tag/[tag_id]`
 
+Removes a reference to a skill tag to the specified post. This can only be called by collaborators on the project.
+
+#### Request
+
+Headers
+
+- `Authorization`: The session token for the user trying to add the skill tag.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+`Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{ message: string} | undefined
+```
+
+Status:
+
+- 200: Tag Removed Successfully
+  - Body will be undefined
+- 401: The authentication token was not provided or was invalid
+  - Body will be undefined
+- 403: The user is not a contributor on the project
+  - Body will be undefined
+- 404: The requested project or skill tag was not found on the project
+  - message will either say "Project Not Found", or "Skill Tag Not Found On Project"
+- 500: Internal Server Error
+  - message will be undefined
+
 ### Update Description `PUT` `/api/v1/project/[project_id]/description`
+
+Changes the description of the project. This can only be called by collaborators on the project.
+
+#### Request
+
+Headers
+
+- `Authorization`: The session token for the user trying to update the description.
+
+Query Params:
+None
+
+Body:
+
+```typescript
+{
+  description: string;
+}
+```
+
+#### Response
+
+Headers:
+`Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{
+    description?:string
+}
+```
+
+Status:
+
+- 200: Description Updated Successfully
+  - `description` will reflect the updated description.
+- 401: The authentication token was not provided or was invalid
+  - `description` will be undefined.
+- 403: The user is not a contributor on the project
+  - `description` will be undefined.
+- 404: The requested project could not be found
+  - `description` will be undefined.
+- 500: Internal Server Error
+  - `description` will be undefined.
 
 ### Serve Image `GET` `/api/v1/project/[project_id]/image/[image_id]`
 
+Serves the specified image. Can be called by anyone. If the `Authorization` header is not provided
+then any images for projects with `draft` visibility will return 404.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user. (Optional)
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+- `Content-Type`:
+  - `image/png` for Portable Network Graphics images.
+  - `image/jpeg` for Joint Photographic Experts Group images.
+  - `image/gif` for Graphics Interchange Format images.
+  - `image/svg+xml` for Scalable Vector Graphics images.
+  - `image/webp` for WebP images.
+  - `image/x-icon` for ICO (icon) files.
+
+Body:
+ReadableStream of Image Data or undefined.
+
+Status:
+
+- 200: Image was served.
+- 404: Image was not found or the specified user did not have visibility rights to this post.
+  - Body will be undefined
+- 500: Internal Server Error
+  - Body will be undefined
+
 ### Add Image `POST` `/api/v1/project/[project_id]/image`
+
+Uploads an image to the MinIO database and links it to this project. Can be called by all project contributors.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
 
 ### Remove Image `DELETE` `/api/v1/project/[project_id]/image/[image_id]`
 
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
+
 ### Add Link `POST` `/api/v1/project/[project_id]/link`
+
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
 
 ### Update Link `PUT` `/api/v1/project/[project_id]/link/[link_id]`
 
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
+
 ### Delete Link `DELETE` `/api/v1/project/[project_id]/link/[link_id]`
+
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
 
 ### Add Question `POST` `/api/v1/project/[project_id]/question`
 
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
+
 ### Update Question `PUT` `/api/v1/project/[project_id]/question/[question_id]`
+
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
 
 ### Delete Question `DELETE` `/api/v1/project/[project_id]/question/[question_id]`
 
+API Endpoint Description. Also describe who should be able to call to this API.
+
+#### Request
+
+Headers:
+
+- `Authorization`: The session token for the user.
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+None
+
+Status:
+
+- 200: Description
+  - Additional Notes
+- 400: Description
+  - Additional Notes
+- 401: Description
+  - Additional Notes
+- 403: Description
+  - Additional Notes
+- 500: Description
+  - Additional Notes
+
 ### Set Course / Group `PUT` `/api/v1/project/[project_id]/course`
-Sets the course / group for the project. This can only be performed by the project owner. 
+
+Sets the course / group for the project. This can only be performed by the project owner.
 
 #### Request
 
@@ -368,9 +1000,10 @@ Query Params:
 None
 
 Body:
+
 ```typescript
 {
-    group: string
+  group: string;
 }
 ```
 
@@ -381,6 +1014,7 @@ Headers
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
     group?: string
@@ -388,13 +1022,14 @@ Body:
 ```
 
 Status:
+
 - 200: Group Updated Successfully
-    - group value will reflect the new group
+  - group value will reflect the new group
 - 401: The authentication token was not provided or was invalid
-    - group value will be undefined
+  - group value will be undefined
 - 403: The user is not the owner of the project
-    - group value will be undefined
+  - group value will be undefined
 - 404: The requested project was not found
-    - group value will be undefined
+  - group value will be undefined
 - 500: Internal Server Error
-    - group value will be undefined
+  - group value will be undefined
