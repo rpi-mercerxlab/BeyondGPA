@@ -19,18 +19,33 @@ This document outlines all API endpoints for Create, Read, Update, and Delete (C
 
 ## API Endpoints
 
+
 ### Project Search `GET` `/api/v1/project`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Lists all projects with the `public` visibility that meet the specified criteria. All users can call to this endpoint. Users can filter by keywords, the majors of the contributors, the skills demonstrated on the project, or the group / course they worked on this project with. Items within the same field have an OR relationship, while each field will have an AND relationship. If a field is empty, then it is excluded from the filter
+
+For example, the query:
+`keywords`: ["Rocket", "Spaceflight"]
+`majors`: ["Mechanical Engineering", "Computer Engineering"]
+`skills`: ["CAD", "FEA"]
+`groups`: []
+
+Will return all projects that have "Rocket" OR "Spaceflight" OR Both in their title or description, AND
+have at least one contributor majoring in "Mechanical Engineering" OR "Computer Engineering", AND
+have at least either "FEA" OR "CAD" specified as one of the skills, AND
+is made as a part of any group.
 
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
-None
+- `limit`: The number of projects to list, optional, default is 24.
+- `keywords`: A list of strings that the description and title should contain. All returned projects will contain at least one keyword from this list. Default is the empty list.
+- `majors`: A list of majors that the owner and collaborator should have. All returned projects will contain at least one contributor with at least one of the specified majors.
+- `skills`: A list of skills that were used on the project. All returned projects will have at least one of the skills listed. 
+- `groups`: Lists projects that are apart of the specified groups / courses.
 
 Body:
 None
@@ -42,20 +57,31 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{
+    projects: {
+        project_id?: string;
+        title: string,
+        contributors: string[],
+        skillTags: string[],
+        group: string,
+        coverImage: {
+            link: string,
+            caption: string
+        }
+    }[]
+}
+```
+
 
 Status:
 
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 200: Search Successful
+  - The list will have at least one item.
+- 404: There were no projects found that satisfied all of the requested properties.
+  - List will be empty.
+- 500: Internal Server Error
+  - List will be empty.
 
 ### Project Creation: `POST` `/api/v1/project/`
 
@@ -138,6 +164,7 @@ Body:
     contributors: {
         name: string,
         email: string,
+        major?: string,
     }[],
     skill_tags: {
         tag: string,
@@ -151,6 +178,7 @@ Body:
         link: string,
         coverText: string,
     }[],
+    description: string,
     questions: {
         id: string,
         questionText: string,
@@ -327,14 +355,14 @@ Body:
 
 ```typescript
 {
-    contributor_id?: string
+    id?: string
 }
 ```
 
 Status:
 
 - 200: Contributor Updated Successfully
-  - Contributor id will be populated with the UUID for the contributor
+  - id will be populated with the UUID for the contributor
 - 401: The authentication token was not provided or was invalid
 - 403: The user is not the owner of the project
 - 404: The requested project was not found
@@ -372,9 +400,10 @@ Body:
 
 ```typescript
 {
-    name?: string,
-    email?: string
-}
+    name: string,
+    email: string,
+    id: string
+} | undefined
 ```
 
 Status:
@@ -382,13 +411,13 @@ Status:
 - 200: Title Updated Successfully
   - Name and email will be set to the new value
 - 401: The authentication token was not provided or was invalid
-  - Name and Email value will be undefined
+  - Body will be undefined
 - 403: The user is not the owner of the project
-  - Name and Email value will be undefined
+  - Body will be undefined
 - 404: The requested project was not found
-  - Name and Email value will be undefined
+  - Body will be undefined
 - 500: Internal Server Error
-  - Name and Email value will be undefined
+  - Body will be undefined
 
 ### Delete Contributor `DELETE` `/api/v1/project/[project_id]/contributor/[contributor_id]`
 
@@ -430,8 +459,7 @@ Lists all the existing skill tags. Can be called by any student.
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to list the skill tags.
+None
 
 Query Params:
 None
@@ -459,10 +487,6 @@ Status:
 
 - 200: Tags are listed in the body
   - tags will be populated with all the existing tags.
-- 401: The authentication token was not provided or was invalid
-  - tags will be undefined
-- 403: The user is not a student
-  - tags will be undefined
 - 500: Internal Server Error
   - tags will be undefined
 
@@ -691,38 +715,42 @@ Uploads an image to the MinIO database and links it to this project. Can be call
 Headers:
 
 - `Authorization`: The session token for the user.
+- `Content-Type`: 
+  - `image/png` for Portable Network Graphics images.
+  - `image/jpeg` for Joint Photographic Experts Group images.
+  - `image/gif` for Graphics Interchange Format images.
+  - `image/svg+xml` for Scalable Vector Graphics images.
+  - `image/webp` for WebP images.
+  - `image/x-icon` for ICO (icon) files.
+- `Content-Length`: The size of the image in bytes
 
 Query Params:
 None
 
 Body:
-None
+The file object of the image being uploaded.
 
 #### Response
 
 Headers:
-
-- `Content-Type`: `application/json`
+None
 
 Body:
 None
 
 Status:
 
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 201: Image Uploaded Successfully
+- 400: Bad Request
+  - If the Content-Type of this endpoint is not one of the above this will be returned.
+- 401: Unauthorized, the user's session token is missing or invalid
+- 403: The user is not a project contributor for the requested project
+- 404: The requested project does not exist
+- 500: Internal Server Error
 
 ### Remove Image `DELETE` `/api/v1/project/[project_id]/image/[image_id]`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Deletes an image from the file storage and disassociates it from the project. Can be called by all project contributors.
 
 #### Request
 
@@ -743,24 +771,26 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{message: string} | undefined
+```
 
 Status:
 
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 204: Image deleted successfully
+  - Body will be undefined
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor on the requested project
+  - Body will be undefined
+- 404: Either the project or image requested does not exist.
+    - Body message will contain either: "Project does not exist" or "Post does not exist"
+- 500: Internal Server Error
+  - Body will be undefined
 
 ### Add Link `POST` `/api/v1/project/[project_id]/link`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Creates a new link associated with the project. Can be called by project collaborators.
 
 #### Request
 
@@ -781,24 +811,27 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{
+id: string;
+} | undefined
+```
 
 Status:
-
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 201: Created Successfully
+  - Body will be populated with relevant info.
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor on the requested project
+  - Body will be undefined
+- 404: The project does not exist
+  - Body will be undefined
+- 500: Internal Server Error
+  - Body will be undefined
 
 ### Update Link `PUT` `/api/v1/project/[project_id]/link/[link_id]`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Updates the link url and cover text, returning the new values. All project contributors of the specified project should be able to call this endpoint.
 
 #### Request
 
@@ -810,7 +843,12 @@ Query Params:
 None
 
 Body:
-None
+```typescript
+{
+url: string;
+coverText: string;
+}
+```
 
 #### Response
 
@@ -819,24 +857,29 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{
+url: string;
+coverText: string;
+id: string;
+} | string | undefined
+```
 
 Status:
-
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 200: Updated Successfully
+  - Body will be populated with the updated link info.
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor on the requested project
+  - Body will be undefined
+- 404: Either the project or the link specified does not exist
+  - Body will say either "Project does not exist" or "Link does not exist"
+- 500: Internal Server Error
+  - Body will be undefined
 
 ### Delete Link `DELETE` `/api/v1/project/[project_id]/link/[link_id]`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Removes the specified link, and disassociates it from the project. All contributors for the specified project should be able to call to this endpoint.
 
 #### Request
 
@@ -853,28 +896,29 @@ None
 #### Response
 
 Headers:
-
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{ message: string } | undefined
+```
 
 Status:
 
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 200: Deleted Successfully
+  - Body will be undefined
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor for the specified project.
+  - Body will be undefined
+- 404: The project or link could not be found.
+  - Message will say "Project does not exist" or "Link does not exist"
+- 500: Internal Server Error
+  - Body will be undefined
 
 ### Add Question `POST` `/api/v1/project/[project_id]/question`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Creates a new question associated with the project. Can be called by project collaborators of the specified project.
 
 #### Request
 
@@ -895,24 +939,27 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{
+id: string;
+} | undefined
+```
 
 Status:
-
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 201: Created Successfully
+  - Body will be populated with relevant info.
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor on the requested project
+  - Body will be undefined
+- 404: The project does not exist
+  - Body will be undefined
+- 500: Internal Server Error
+  - Body will be undefined
 
 ### Update Question `PUT` `/api/v1/project/[project_id]/question/[question_id]`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Updates the prompt or response for a question beloning to a project. Can be called by all contributors to the specified project.
 
 #### Request
 
@@ -924,7 +971,12 @@ Query Params:
 None
 
 Body:
-None
+```typescript
+{
+url: string;
+coverText: string;
+}
+```
 
 #### Response
 
@@ -933,24 +985,29 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{
+url: string;
+coverText: string;
+id: string;
+} | string | undefined
+```
 
 Status:
-
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 200: Updated Successfully
+  - Body will be populated with the updated link info.
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor on the requested project
+  - Body will be undefined
+- 404: Either the project or the link specified does not exist
+  - Body will say either "Project does not exist" or "Link does not exist"
+- 500: Internal Server Error
+  - Body will be undefined
 
 ### Delete Question `DELETE` `/api/v1/project/[project_id]/question/[question_id]`
 
-API Endpoint Description. Also describe who should be able to call to this API.
+Removes the specified question prompt and response from the Database, and disassociates it from the project. All contributors for the specified project should be able to call to this endpoint.
 
 #### Request
 
@@ -967,24 +1024,25 @@ None
 #### Response
 
 Headers:
-
 - `Content-Type`: `application/json`
 
 Body:
-None
+```typescript
+{ message: string } | undefined
+```
 
 Status:
 
-- 200: Description
-  - Additional Notes
-- 400: Description
-  - Additional Notes
-- 401: Description
-  - Additional Notes
-- 403: Description
-  - Additional Notes
-- 500: Description
-  - Additional Notes
+- 200: Deleted Successfully
+  - Body will be undefined
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor for the specified project.
+  - Body will be undefined
+- 404: The project or link could not be found.
+  - Message will say "Project does not exist" or "Question does not exist"
+- 500: Internal Server Error
+  - Body will be undefined
 
 ### Set Course / Group `PUT` `/api/v1/project/[project_id]/course`
 
