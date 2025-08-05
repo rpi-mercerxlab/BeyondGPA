@@ -7,7 +7,7 @@ export default function ProductionLogin() {
     <div>
       <button
         onClick={async () => {
-          await signIn("RPI-SHIBBOLETH");
+          await signIn("rpi");
         }}
       >
         Login with RCSID

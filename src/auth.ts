@@ -7,7 +7,7 @@ import { prisma } from "@/prisma"
 const isProduction = process.env.NEXTAUTH_ENV === 'production';
 
 const RPI_SHIBBOLETH_PROVIDER: Provider = {
-    id: "RPI-SHIBBOLETH",
+    id: "rpi",
     name: "RPI Shibboleth",
     type: "oauth",
     clientId: process.env.RPI_SHIBBOLETH_CLIENT_ID,
@@ -21,7 +21,9 @@ const RPI_SHIBBOLETH_PROVIDER: Provider = {
             name: profile.name,
             email: profile.email,
         };
-    }
+    },
+    idToken: true,
+    checks: ["pkce", "state"]
 }
 
 const DEVELOPMENT_PROVIDER: Provider = Credentials({
@@ -75,6 +77,7 @@ export const handlers = NextAuth({
             session.user = user;
             return session;
         }
-    }
+    },
+    debug: process.env.NEXTAUTH_DEBUG === "true",
 });
 
