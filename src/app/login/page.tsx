@@ -1,11 +1,20 @@
 import Footer from "@/components/footer";
-import Header from "@/components/header";
+import Header from "@/components/header/header";
 import DevLogin from "@/components/login/dev_login";
 import ProductionLogin from "@/components/login/prod_login";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/authentication/auth";
 
 const IS_DEVELOPMENT = process.env.NEXTAUTH_ENV !== "production";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getServerSession(authOptions);
+
+  if (session) {
+    redirect("/");
+  }
+
   return (
     <div className="flex flex-col items-start justify-start min-h-screen">
       <Header />

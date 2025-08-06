@@ -1,9 +1,11 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import { Provider } from "next-auth/providers/index";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/prisma";
-import { RPI_SHIBBOLETH_PROVIDER, DEVELOPMENT_PROVIDER } from "@/authentication/providers";
-
+import {
+  RPI_SHIBBOLETH_PROVIDER,
+  DEVELOPMENT_PROVIDER,
+} from "@/authentication/providers";
 
 const isProduction = process.env.NEXTAUTH_ENV === "production";
 
@@ -24,20 +26,22 @@ if (!isProduction) {
   ];
 }
 
-export const handlers = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers,
   secret: process.env.NEXTAUTH_SECRET,
+  // @ts-ignore
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "database",
     maxAge: parseInt(process.env.SESSION_LIFETIME_DAYS || "30") * 24 * 60 * 60, // Convert days to seconds
   },
   callbacks: {
-    async session({ session, token, user }) {
-      console.log("Session Callback: ", session, token, user);
+    async session({ session, user }) {
       session.user = user;
       return session;
     },
   },
   debug: process.env.NEXTAUTH_DEBUG === "true",
-});
+};
+
+export const handlers = NextAuth(authOptions);

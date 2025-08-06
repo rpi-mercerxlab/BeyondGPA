@@ -50,11 +50,16 @@ export function RPI_SHIBBOLETH_PROVIDER(config: RPI_PROVIDER_CONFIG): Provider {
         }
       }
 
+      const names = profile.name.split(" ,");
+
       return {
         id: profile.sub,
-        name: profile.name,
+        firstName: names[1] || "",
+        lastName: names[0] || "",
+        rcsid: profile.preferred_username || profile.sub.split("@")[0],
         email: profile.email,
         role: "student", // Default value if userinfo fetch fails
+        emailVerified: null, // Set to null if not available
       };
     },
   };
@@ -101,8 +106,9 @@ export const DEVELOPMENT_PROVIDER: Provider = Credentials({
   name: "Mock Login",
   credentials: {
     rcsid: { label: "RCSID", type: "text" },
-    name: { label: "Name", type: "text" },
-    eduPersonAffiliation: { label: "Affiliation", type: "text" },
+    firstName: { label: "Name", type: "text" },
+    lastName: { label: "Last Name", type: "text" },
+    eduScopedPersonAffiliation: { label: "Affiliation", type: "text" },
     department: { label: "Department", type: "text" },
   },
   async authorize(credentials) {
@@ -111,10 +117,12 @@ export const DEVELOPMENT_PROVIDER: Provider = Credentials({
     }
 
     const user = {
-      id: credentials.rcsid, // Use RCS ID as the unique identifier
-      name: credentials.name,
+      id: `${credentials.rcsid}@rpi.edu`, // Use RCS ID as the unique identifier
+      firstName: credentials.firstName || "",
+      lastName: credentials.lastName || "",
+      rcsid: credentials.rcsid,
       email: `${credentials.rcsid}@rpi.edu`,
-      eduPersonAffiliation: credentials.eduPersonAffiliation || "student",
+      role: credentials.eduScopedPersonAffiliation || "student",
       department: credentials.department || "General Studies",
     };
     return user;
