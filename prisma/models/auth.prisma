@@ -1,11 +1,17 @@
 model User {
-    id         String @id
-    name       String
+    // Authentication and user management model
+    id         String @id @default(cuid())
+    rcsid      String? // RPI-specific identifier, can be null if not applicable
+    firstName  String
+    lastName   String
     email      String @unique
     role       String // "student", "faculty". "external" may be added later, finer grained roles can be added later
-    department String
+    emailVerified Boolean? @default(false) // Indicates if the user has verified their email
     accounts Account[]
     sessions Session[]
+
+    // Additional fields can be added later as needed
+    department String? // We don't know this until the user gives us this information
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
