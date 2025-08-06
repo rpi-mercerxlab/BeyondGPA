@@ -55,7 +55,7 @@ const RPI_SHIBBOLETH_PROVIDER: Provider = {
           id: profile.sub, // Use the sub from the profile as the unique identifier
           firstName: userinfo.given_name || "",
           lastName: userinfo.family_name || "",
-          emailVerified: true, // Assuming email is verified since they authed with RPI
+          emailVerified: new Date().toISOString(), // Assuming email is verified since they authed with RPI
         };
 
         console.log("Final user object: ", user);
