@@ -11,11 +11,11 @@ export default function Header() {
         height={25}
         className="inline-block mr-2"
       />
-      <h1 className="text-xl xs:text-2xl font-sans">
+      <a href="/" className="text-lg sm:text-xl md:text-2xl font-sans">
         <span className="font-bold">Mercer XLab</span>
         <span className="p-2">-</span>
         <span className="font-light italic">BeyondGPA</span>
-      </h1>
+      </a>
       <div className="flex grow shrink basis-auto"></div>
       <HeaderLoginButton />
     </header>

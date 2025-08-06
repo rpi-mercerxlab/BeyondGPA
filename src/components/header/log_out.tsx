@@ -2,6 +2,7 @@
 
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
+import BeyondButton from "../common/BeyondButton";
 
 export default function LogOutButton({ session }: { session: Session }) {
   const greeting =
@@ -13,18 +14,19 @@ export default function LogOutButton({ session }: { session: Session }) {
 
   return (
     <>
-      <h2>
+      <h2 className="hidden sm:block">
         {greeting},{" "}
         {`${session.user?.firstName} ${session.user?.lastName || ""}`.trim()}!
       </h2>
-      <button
+      <BeyondButton
+        className="w-fit"
         onClick={() => {
           console.log("signing_out");
           signOut({ callbackUrl: "/" });
         }}
       >
         Log Out
-      </button>
+      </BeyondButton>
     </>
   );
 }
