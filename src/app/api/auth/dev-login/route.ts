@@ -26,6 +26,7 @@ export async function POST(request: Request) {
       rcsid: user.rcsid || "",
       role: user.role || "student",
       emailVerified: null, // Set to null for mock users
+      id: randomUUID(),
     },
     update: {},
   });
@@ -38,11 +39,11 @@ export async function POST(request: Request) {
       userId: resp.id,
       expires: new Date(
         Date.now() +
-          parseInt(process.env.SESSION_LIFETIME_DAYS || "30") *
-            24 *
-            60 *
-            60 *
-            1000 // Convert days to milliseconds
+        parseInt(process.env.SESSION_LIFETIME_DAYS || "30") *
+        24 *
+        60 *
+        60 *
+        1000 // Convert days to milliseconds
       ).toISOString(),
     },
   });

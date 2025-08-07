@@ -791,30 +791,93 @@ Headers:
   - `image/svg+xml` for Scalable Vector Graphics images.
   - `image/webp` for WebP images.
   - `image/x-icon` for ICO (icon) files.
+  - `application/json` for links to external images.
 - `Content-Length`: The size of the image in bytes
 
 Query Params:
 None
 
 Body:
-The file object of the image being uploaded.
+The file object of the image being uploaded. Or
+
+```typescript
+{link: string, alt: string}
+```
+
+if you are adding an external image link.
 
 #### Response
 
 Headers:
-None
+`content-type`: `application/json`
 
 Body:
-None
+
+```typescript
+{
+  id: string;
+  link: string;
+  alt: string;
+  storageRemaining: number; // In bytes
+} | undefined
+```
 
 Status:
 
 - 201: Image Uploaded Successfully
+  - All fields will be populated with relevant info.
 - 400: Bad Request
   - If the Content-Type of this endpoint is not one of the above this will be returned.
+  - If there are too few bytes remaining in the project's storage quota to upload this image.
 - 401: Unauthorized, the user's session token is missing or invalid
 - 403: The user is not a project contributor for the requested project or does not have the editor role.
 - 404: The requested project does not exist
+- 429: Rate Limit Exceeded.
+- 500: Internal Server Error
+
+### Update Image Alt Text `PUT` `/api/v1/project/[project_id]/image/[image_id]`
+
+Updates the alt text for the specified image. Can be called by all project contributors with the editor role.
+
+#### Request
+
+Headers:
+`Content-Type`: `application/json`
+
+Query Params:
+None
+Body:
+
+```typescript
+{
+  alt: string;
+}
+```
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{
+  alt?: string;
+}
+```
+
+Status:
+
+- 200: Alt Text Updated Successfully
+  - `alt` will reflect the updated alt text.
+- 401: The authentication token was not provided or was invalid
+  - `alt` will be undefined.
+- 403: The user is not a contributor on the project or does not have the editor role.
+  - `alt` will be undefined.
+- 404: The requested project or image could not be found
+  - `alt` will be undefined.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
 

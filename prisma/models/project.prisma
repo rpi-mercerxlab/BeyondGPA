@@ -1,0 +1,94 @@
+model Project {
+    id               String            @id @default(cuid())
+    owner            User              @relation("owner", fields: [ownerId], references: [id])
+    ownerId          String
+    contributors     Contributor[]
+    title            String            @default("")
+    description      String            @default("")
+    visibility       ProjectVisibility @default(DRAFT)
+    skillTags        SkillTag[]
+    thumbnail        ThumbnailImage?
+    images           Image[]
+    storageRemaining Int               @default(10000000) // in bytes, default to 10MB
+    links            Link[]
+    questionPrompts  QuestionPrompt[]
+    groupName        String            @default("")
+    softDeleted      Boolean           @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Contributor {
+    id        String          @id @default(cuid())
+    user      User?           @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+    userId    String?
+    project   Project         @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    projectId String
+    role      ContributorRole @default(VIEWER)
+    name      String          @default("")
+    email     String          @default("")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum ContributorRole {
+    EDITOR
+    VIEWER
+}
+
+enum ProjectVisibility {
+    DRAFT
+    PUBLIC
+}
+
+model SkillTag {
+    id       String    @id
+    name     String    @unique
+    projects Project[]
+}
+
+model ThumbnailImage {
+    id        String  @id @default(cuid())
+    url       String  @default("")
+    altText   String  @default("")
+    project   Project @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    projectId String  @unique
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Image {
+    id        String  @id @default(cuid())
+    url       String  @default("")
+    altText   String  @default("")
+    project   Project @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    projectId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Link {
+    id        String  @id @default(cuid())
+    url       String  @default("")
+    label     String  @default("")
+    project   Project @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    projectId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model QuestionPrompt {
+    id        String  @id @default(cuid())
+    question  String  @default("")
+    answer    String  @default("")
+    project   Project @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    projectId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
