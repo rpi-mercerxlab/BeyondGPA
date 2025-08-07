@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
 
 export default function DevLogin() {
   return (
@@ -10,25 +10,40 @@ export default function DevLogin() {
         e.preventDefault();
         const formData = new FormData(e.target as HTMLFormElement);
         const rcsid = formData.get("rcsid");
-        const name = formData.get("name");
-        const eduPersonAffiliation = formData.get("eduPersonAffiliation");
+        const firstName = formData.get("firstName");
+        const lastName = formData.get("lastName");
+        const role = formData.get("eduScopedPersonAffiliation");
         const department = formData.get("department");
-        await signIn("mock-login", {
-          rcsid,
-          name,
-          eduPersonAffiliation,
-          department,
+        await fetch("/api/auth/dev-login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rcsid,
+            firstName,
+            lastName,
+            role,
+            department,
+            email: `${rcsid}@rpi.edu`, 
+          }),
+        }).then((res) => {
+          if (!res.ok) {
+            console.error("Error during login:", res.statusText);
+            return;
+          }
+          redirect("/"); // Redirect to home page after login
         });
       }}
     >
       <input type="text" name="rcsid" placeholder="RCSID" />
-      <input type="text" name="name" placeholder="Name" />
+      <input type="text" name="firstName" placeholder="First Name" />
+      <input type="text" name="lastName" placeholder="Last Name" />
       <input
         type="text"
-        name="eduPersonAffiliation"
+        name="eduScopedPersonAffiliation"
         placeholder="Affiliation"
       />
-      <input type="text" name="department" placeholder="Department" />
       <button type="submit">Login as Mock User</button>
     </form>
   );

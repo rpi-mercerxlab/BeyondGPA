@@ -11,7 +11,7 @@ const isProduction = process.env.NEXTAUTH_ENV === "production";
 
 let providers: Provider[] = [];
 if (!isProduction) {
-  providers = [DEVELOPMENT_PROVIDER];
+  providers = [DEVELOPMENT_PROVIDER()];
 } else {
   providers = [
     RPI_SHIBBOLETH_PROVIDER({
@@ -36,7 +36,37 @@ export const authOptions: NextAuthOptions = {
     maxAge: parseInt(process.env.SESSION_LIFETIME_DAYS || "30") * 24 * 60 * 60, // Convert days to seconds
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "rpi") {
+        // For RPI login, we can skip additional checks
+        return true;
+      }
+
+      // For the mock, we look to see if the user is already in the database
+      const existingUser = await prisma.user.findUnique({
+        where: { email: user.email },
+      });
+
+      if (!existingUser) {
+        // If the user doesn't exist, create a new user record
+        await prisma.user.create({
+          data: {
+            email: user.email,
+            firstName: user.firstName || "",
+            lastName: user.lastName || "",
+            rcsid: user.rcsid || "",
+            role: user.role || "student",
+            emailVerified: null,
+          },
+        });
+      }
+
+      return true;
+    },
+
     async session({ session, user }) {
+      console.log("Session callback triggered", { session, user });
+
       session.user = user;
       return session;
     },

@@ -1,4 +1,3 @@
-import Credentials from "next-auth/providers/credentials";
 import { Provider } from "next-auth/providers/index";
 
 export function RPI_SHIBBOLETH_PROVIDER(config: RPI_PROVIDER_CONFIG): Provider {
@@ -102,29 +101,30 @@ type USER_PROFILE = {
   family_name?: string;
 };
 
-export const DEVELOPMENT_PROVIDER: Provider = Credentials({
-  name: "Mock Login",
-  credentials: {
-    rcsid: { label: "RCSID", type: "text" },
-    firstName: { label: "Name", type: "text" },
-    lastName: { label: "Last Name", type: "text" },
-    eduScopedPersonAffiliation: { label: "Affiliation", type: "text" },
-    department: { label: "Department", type: "text" },
-  },
-  async authorize(credentials) {
-    if (!credentials) {
-      return null;
-    }
-
-    const user = {
-      id: `${credentials.rcsid}@rpi.edu`, // Use RCS ID as the unique identifier
-      firstName: credentials.firstName || "",
-      lastName: credentials.lastName || "",
-      rcsid: credentials.rcsid,
-      email: `${credentials.rcsid}@rpi.edu`,
-      role: credentials.eduScopedPersonAffiliation || "student",
-      department: credentials.department || "General Studies",
-    };
-    return user;
-  },
-});
+export function DEVELOPMENT_PROVIDER(): Provider {
+  return {
+    id: "mock-login",
+    name: "Mock Login",
+    type: "oauth",
+    wellKnown: "https://example.com/.well-known/openid-configuration",
+    clientId: "dev-client-id",
+    clientSecret: "dev-client-secret",
+    authorization: {
+      url: "https://example.com/auth",
+      params: { scope: "openid" },
+    },
+    token: "https://example.com/token",
+    userinfo: "https://example.com/userinfo",
+    profile(profile) {
+      return {
+        id: profile.sub,
+        firstName: profile.given_name,
+        lastName: profile.family_name,
+        email: profile.email,
+        rcsid: profile.preferred_username || profile.sub.split("@")[0],
+        role: profile.eduPersonScopedAffiliation || "student",
+        emailVerified: null, // Assuming email verification is not available in mock
+      };
+    },
+  };
+}
