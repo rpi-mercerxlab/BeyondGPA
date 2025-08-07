@@ -1,0 +1,57 @@
+model User {
+    // Authentication and user management model
+    id         String @id @default(cuid())
+    rcsid      String? // RPI-specific identifier, can be null if not applicable
+    firstName  String
+    lastName   String
+    email      String @unique
+    role       String // "student", "faculty". "external" may be added later, finer grained roles can be added later
+    emailVerified DateTime? 
+    accounts Account[]
+    sessions Session[]
+
+    // Additional fields can be added later as needed
+    department String? // We don't know this until the user gives us this information
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Account {
+    id                String @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String?
+    access_token      String?
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String?
+    session_state     String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model VerificationToken {
+    identifier String
+    token      String
+    expires    DateTime
+
+    @@id([identifier, token])
+}
