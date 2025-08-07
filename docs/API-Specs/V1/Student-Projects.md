@@ -20,8 +20,10 @@ This document outlines all API endpoints for Create, Read, Update, and Delete (C
 > [!IMPORTANT]
 > All endpoints will be rate limited to one request per second per IP.
 
-## API Endpoints
+> [!IMPORTANT]
+> All endpoints will receive the session token via the NextAuth cookie. No authorization header required.
 
+## API Endpoints
 
 ### Project Search `GET` `/api/v1/project`
 
@@ -48,11 +50,12 @@ Headers:
 None
 
 Query Params:
+
 - `limit`: The number of projects to list, optional, default is 24.
 - `token`: The pagination token for listing the next set of results.
 - `keywords`: A list of strings that the description and title should contain. All returned projects will contain at least one keyword from this list. Default is the empty list.
 - `majors`: A list of majors that the owner and collaborator should have. All returned projects will contain at least one contributor with at least one of the specified majors.
-- `skills`: A list of skills that were used on the project. All returned projects will have at least one of the skills listed. 
+- `skills`: A list of skills that were used on the project. All returned projects will have at least one of the skills listed.
 - `groups`: Lists projects that are apart of the specified groups / courses.
 
 Body:
@@ -65,6 +68,7 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
     projects: {
@@ -82,13 +86,12 @@ Body:
 }
 ```
 
-
 Status:
 
 - 200: Search Successful
   - The list will have at least one item. If there are more items than the limit, a pagination token will be provided, otherwise it will be undefined.
 - 400: If there are too many keywords, majors, skill tags etc. (> 10 items in each category)
-    - List will be empty and token will be undefined.
+  - List will be empty and token will be undefined.
 - 404: There were no projects found that satisfied all of the requested properties.
   - List will be empty.
 - 429: Rate Limit Exceeded.
@@ -104,8 +107,7 @@ This project will be defined with draft visibility, so its only visible to owner
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to create the post.
+None
 
 Query Params
 None
@@ -152,8 +154,7 @@ If this project is marked as draft, then this will return 404 for all users exce
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to read the post. This is optional.
+None
 
 Query Params:
 None
@@ -176,7 +177,7 @@ Body:
     title: string,
     owner: {
         name: string,
-        email: string        
+        email: string
     }
     contributors: {
         name: string,
@@ -221,13 +222,12 @@ Status:
 
 ### Project Delete: `DELETE` `/api/v1/project/[project_id]`
 
-Soft Deletes the specified project. After 30 days of being soft deleted, the project and any image stored with the project will be deleted. This can only be performed by the project owner. A restoration will need to be done manually for right now. 
+Soft Deletes the specified project. After 30 days of being soft deleted, the project and any image stored with the project will be deleted. This can only be performed by the project owner. A restoration will need to be done manually for right now.
 
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to delete the project.
+None
 
 Query Params:
 None
@@ -260,8 +260,7 @@ Transfers ownership of the project to the user specified. Can only be called by 
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
 None
@@ -310,8 +309,7 @@ Sets the project visibility. Only the owner of the project can call to this endp
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+`Content-Type`: `application/json`
 
 Query Params:
 None
@@ -359,8 +357,7 @@ Sets the title for the project. This can only be performed by the project owner.
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to update the project title.
+None
 
 Query Params:
 None
@@ -408,8 +405,7 @@ Adds a new contributor to the project. This can only be performed by the project
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to add the contributor.
+None
 
 Query Params:
 None
@@ -447,8 +443,7 @@ Updates the name and email of the specified contributor. This can only be perfor
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to update the project title.
+`Content-Type`: `application/json`
 
 Query Params:
 None
@@ -501,8 +496,7 @@ Removes a contributor from the project. This can only be performed by the projec
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to update the project title.
+None
 
 Query Params:
 None
@@ -569,13 +563,12 @@ Status:
 
 ### Create New Skill Tag `POST` `/api/v1/project/skill-tags/`
 
-Creates a new skill tag on the database.  This can only be called by students.
+Creates a new skill tag on the database. This can only be called by students.
 
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to create the skill tag.
+`Content-Type`: `application/json`
 
 Query Params:
 None
@@ -621,8 +614,7 @@ Adds a reference to a skill tag to the specified post. This can only be called b
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to add the skill tag.
+None
 
 Query Params:
 None
@@ -664,8 +656,7 @@ Removes a reference to a skill tag to the specified post. This can only be calle
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to add the skill tag.
+None
 
 Query Params:
 None
@@ -705,8 +696,7 @@ Changes the description of the project. This can only be called by collaborators
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to update the description.
+`Content-Type`: `application/json`
 
 Query Params:
 None
@@ -754,8 +744,7 @@ then any images for projects with `draft` visibility will return 404.
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user. (Optional)
+None
 
 Query Params:
 None
@@ -766,6 +755,7 @@ None
 #### Response
 
 Headers:
+
 - `Content-Type`:
   - `image/png` for Portable Network Graphics images.
   - `image/jpeg` for Joint Photographic Experts Group images.
@@ -794,8 +784,7 @@ Uploads an image to the MinIO database and links it to this project. Can be call
 
 Headers:
 
-- `Authorization`: The session token for the user.
-- `Content-Type`: 
+- `Content-Type`:
   - `image/png` for Portable Network Graphics images.
   - `image/jpeg` for Joint Photographic Experts Group images.
   - `image/gif` for Graphics Interchange Format images.
@@ -836,8 +825,7 @@ Deletes an image from the file storage and disassociates it from the project. Ca
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
 None
@@ -852,6 +840,7 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {message: string} | undefined
 ```
@@ -865,7 +854,7 @@ Status:
 - 403: The user is not a contributor on the requested project or does not have the editor role.
   - Body will be undefined
 - 404: Either the project or image requested does not exist.
-    - Body message will contain either: "Project does not exist" or "Post does not exist"
+  - Body message will contain either: "Project does not exist" or "Post does not exist"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
   - Body will be undefined
@@ -877,8 +866,7 @@ Creates a new link associated with the project. Can be called by project collabo
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
 None
@@ -893,6 +881,7 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
 id: string;
@@ -900,6 +889,7 @@ id: string;
 ```
 
 Status:
+
 - 201: Created Successfully
   - Body will be populated with relevant info.
 - 401: The session token is missing or invalid.
@@ -919,17 +909,17 @@ Updates the link url and cover text, returning the new values. All project contr
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+`Content-Type`: `application/json`
 
 Query Params:
 None
 
 Body:
+
 ```typescript
 {
-url: string;
-coverText: string;
+  url: string;
+  coverText: string;
 }
 ```
 
@@ -940,6 +930,7 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
 url: string;
@@ -949,6 +940,7 @@ id: string;
 ```
 
 Status:
+
 - 200: Updated Successfully
   - Body will be populated with the updated link info.
 - 401: The session token is missing or invalid.
@@ -968,8 +960,7 @@ Removes the specified link, and disassociates it from the project. All contribut
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
 None
@@ -980,9 +971,11 @@ None
 #### Response
 
 Headers:
+
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 { message: string } | undefined
 ```
@@ -1008,8 +1001,7 @@ Creates a new question associated with the project. Can be called by project col
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
 None
@@ -1024,6 +1016,7 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
 id: string;
@@ -1031,6 +1024,7 @@ id: string;
 ```
 
 Status:
+
 - 201: Created Successfully
   - Body will be populated with relevant info.
 - 401: The session token is missing or invalid.
@@ -1050,17 +1044,17 @@ Updates the prompt or response for a question beloning to a project. Can be call
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
 None
 
 Body:
+
 ```typescript
 {
-url: string;
-coverText: string;
+  url: string;
+  coverText: string;
 }
 ```
 
@@ -1071,6 +1065,7 @@ Headers:
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 {
 url: string;
@@ -1080,6 +1075,7 @@ id: string;
 ```
 
 Status:
+
 - 200: Updated Successfully
   - Body will be populated with the updated link info.
 - 401: The session token is missing or invalid.
@@ -1099,8 +1095,7 @@ Removes the specified question prompt and response from the Database, and disass
 #### Request
 
 Headers:
-
-- `Authorization`: The session token for the user.
+None
 
 Query Params:
 None
@@ -1111,9 +1106,11 @@ None
 #### Response
 
 Headers:
+
 - `Content-Type`: `application/json`
 
 Body:
+
 ```typescript
 { message: string } | undefined
 ```
@@ -1139,8 +1136,7 @@ Sets the course / group for the project. This can only be performed by the proje
 #### Request
 
 Headers
-
-- `Authorization`: The session token for the user trying to update the project title.
+None
 
 Query Params:
 None
