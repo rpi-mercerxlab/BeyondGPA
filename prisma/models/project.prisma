@@ -12,11 +12,10 @@ model Project {
     storageRemaining Int               @default(10000000) // in bytes, default to 10MB
     links            Link[]
     questionPrompts  QuestionPrompt[]
-    groupName        String            @default("")
-    softDeleted      Boolean           @default(false)
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    group            Group?            @relation(fields: [groupId], references: [id], onUpdate: Cascade, onDelete: SetNull)
+    groupId          String?         
+    createdAt        DateTime          @default(now())
+    updatedAt        DateTime          @updatedAt
 }
 
 model Contributor {
@@ -41,6 +40,7 @@ enum ContributorRole {
 enum ProjectVisibility {
     DRAFT
     PUBLIC
+    DELETED
 }
 
 model SkillTag {
@@ -91,4 +91,12 @@ model QuestionPrompt {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model Group {
+    id        String    @id @default(cuid())
+    name      String    @unique
+    projects  Project[] 
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
 }

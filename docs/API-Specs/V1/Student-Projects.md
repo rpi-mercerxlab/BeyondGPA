@@ -27,16 +27,14 @@ This document outlines all API endpoints for Create, Read, Update, and Delete (C
 
 ### Project Search `GET` `/api/v1/project`
 
-Lists all projects with the `public` visibility that meet the specified criteria. All users can call to this endpoint. Users can filter by keywords, the majors of the contributors, the skills demonstrated on the project, or the group / course they worked on this project with. Items within the same field have an OR relationship, while each field will have an AND relationship. If a field is empty, then it is excluded from the filter
+Lists all projects with the `public` visibility that meet the specified criteria. All users can call to this endpoint. Users can filter by keywords, the skills demonstrated on the project, or the group / course they worked on this project with. Items within the same field have an OR relationship, while each field will have an AND relationship. If a field is empty, then it is excluded from the filter
 
 For example, the query:
 `keywords`: ["Rocket", "Spaceflight"]
-`majors`: ["Mechanical Engineering", "Computer Engineering"]
 `skills`: ["CAD", "FEA"]
 `groups`: []
 
 Will return all projects that have "Rocket" OR "Spaceflight" OR Both in their title or description, AND
-have at least one contributor majoring in "Mechanical Engineering" OR "Computer Engineering", AND
 have at least either "FEA" OR "CAD" specified as one of the skills, AND
 is made as a part of any group.
 
@@ -54,7 +52,6 @@ Query Params:
 - `limit`: The number of projects to list, optional, default is 24.
 - `token`: The pagination token for listing the next set of results.
 - `keywords`: A list of strings that the description and title should contain. All returned projects will contain at least one keyword from this list. Default is the empty list.
-- `majors`: A list of majors that the owner and collaborator should have. All returned projects will contain at least one contributor with at least one of the specified majors.
 - `skills`: A list of skills that were used on the project. All returned projects will have at least one of the skills listed.
 - `groups`: Lists projects that are apart of the specified groups / courses.
 
@@ -74,16 +71,17 @@ Body:
     projects: {
         project_id?: string;
         title: string,
+        description: string,
         contributors: string[],
         skillTags: string[],
-        group: string,
-        coverImage: {
-            link: string,
-            caption: string
+        group: string | undefined,
+        thumbnail: {
+            link: string | undefined,
+            caption: string | undefined
         }
     }[];
     paginationToken?: string; // This will be the id of the item to start at.
-}
+} | string
 ```
 
 Status:
@@ -172,7 +170,7 @@ Body:
 
 ```typescript
 {
-  project_id?: {
+  project?: {
     project_id: string,
     title: string,
     owner: {
@@ -182,7 +180,8 @@ Body:
     contributors: {
         name: string,
         email: string,
-        major?: string,
+        role: "EDITOR" | "VIEWER",
+        id: string
     }[],
     skill_tags: {
         tag: string,
@@ -190,11 +189,17 @@ Body:
     }[],
     images: {
         link: string,
-        caption: string
+        caption: string,
+        id: string,
     }[],
+    thumbnail: {
+        link: string | undefined,
+        caption: string | undefined
+    },
     links: {
         link: string,
         coverText: string,
+        id: string,
     }[],
     description: string,
     questions: {
@@ -203,9 +208,11 @@ Body:
         answerText: string,
     }[],
     group: {
-        group: string,
-        id: string
-    },
+        id: string | undefined,
+        name: string | undefined,
+    }
+    createdAt: string,
+    updatedAt: string,
   }
 }
 ```
@@ -214,8 +221,9 @@ Status:
 
 - 200: Project Fetched Successfully
   - project will be fully populated
-- 404: The requested project was not found or the user did not have permission to access it
-  - project will be undefined
+- 404: The requested project was not found
+- 403: The user does not have permission to access this project
+  - This will be returned if the project is marked as draft and the user is not the owner or a contributor.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
   - project will be undefined
@@ -285,7 +293,13 @@ Body:
 {
     name: string,
     email: string,
-} | undefined
+    contributors: {
+        name: string,
+        email: string,
+        id: string,
+        role: "EDITOR" | "VIEWER",
+    }[],
+} | string | undefined
 ```
 
 Status:
@@ -296,8 +310,8 @@ Status:
   - body will be undefined
 - 403: The user is not the project owner.
   - body will be undefined
-- 404: The email of the new owner is not registered to a known user.
-  - body will be undefined
+- 404: The email of the new owner is not registered to a known user. Or the project was not found.
+  - body will say either "New Owner Not Found" or "Project Not Found"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
   - body will be undefined
@@ -318,7 +332,7 @@ Body:
 
 ```typescript
 {
-  visibility: "public" | "draft";
+  visibility: "PUBLIC" | "DRAFT";
 }
 ```
 
@@ -332,7 +346,7 @@ Body:
 
 ```typescript
 {
-    visibility?: "public" | "draft"
+    visibility?: "PUBLIC" | "DRAFT"
 }
 ```
 
@@ -340,7 +354,7 @@ Status:
 
 - 200: Visibility Set Successfully
   - `visibility` will be set to the updated visibility value
-- 400: If the specified visibility is not one of `public` or `draft`
+- 400: If the specified visibility is not one of `PUBLIC` or `DRAFT`
   - `visibility` will be undefined
 - 401: The user's session token is not provided or invalid
   - `visibility` will be undefined
@@ -357,7 +371,7 @@ Sets the title for the project. This can only be performed by the project owner.
 #### Request
 
 Headers
-None
+`Content-Type`: `application/json`
 
 Query Params:
 None
@@ -366,7 +380,7 @@ Body:
 
 ```typescript
 {
-  newTitle: string;
+  title: string;
 }
 ```
 
@@ -388,6 +402,8 @@ Status:
 
 - 200: Title Updated Successfully
   - title value will reflect the new title
+- 400: If the title is an empty string or longer than 100 characters
+  - title value will be undefined
 - 401: The authentication token was not provided or was invalid
   - title value will be undefined
 - 403: The user is not the owner of the project
@@ -454,7 +470,7 @@ Body:
 {
     name: string,
     email: string,
-    role: "editor" | "viewer",
+    role: "EDITOR" | "VIEWER",
 }
 ```
 
@@ -470,9 +486,9 @@ Body:
 {
     name: string,
     email: string,
-    role?: "editor" | "viewer"
+    role: "EDITOR" | "VIEWER"
     id: string
-} | undefined
+} | string | undefined
 ```
 
 Status:
