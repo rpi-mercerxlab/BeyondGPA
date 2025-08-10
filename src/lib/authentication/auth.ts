@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import { Provider } from "next-auth/providers/index";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/prisma";
+import { prisma } from "@/lib/prisma";
 import {
   RPI_SHIBBOLETH_PROVIDER,
   DEVELOPMENT_PROVIDER,

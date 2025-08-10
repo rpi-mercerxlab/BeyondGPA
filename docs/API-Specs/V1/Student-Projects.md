@@ -646,9 +646,7 @@ Headers:
 Body:
 
 ```typescript
-{
-    message: string
-} | undefined
+string | undefined;
 ```
 
 Status:
@@ -754,8 +752,7 @@ Status:
 
 ### Serve Image `GET` `/api/v1/project/[project_id]/image/[image_id]`
 
-Serves the specified image. Can be called by anyone. If the `Authorization` header is not provided
-then any images for projects with `draft` visibility will return 404.
+Serves the specified image. Can be called by anyone.
 
 #### Request
 
@@ -786,8 +783,9 @@ ReadableStream of Image Data or undefined.
 Status:
 
 - 200: Image was served.
-- 404: Image was not found or the specified user did not have visibility rights to this post.
-  - Body will be undefined
+- 404: Image was not found
+- 403: The user does not have permission to access this image
+  - This will be returned if the project is marked as draft and the user is not the owner or a contributor.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
   - Body will be undefined
@@ -808,7 +806,6 @@ Headers:
   - `image/webp` for WebP images.
   - `image/x-icon` for ICO (icon) files.
   - `application/json` for links to external images.
-- `Content-Length`: The size of the image in bytes
 
 Query Params:
 None

@@ -4,7 +4,7 @@ import DevLogin from "@/components/login/dev_login";
 import ProductionLogin from "@/components/login/prod_login";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/authentication/auth";
+import { authOptions } from "@/lib/authentication/auth";
 
 const IS_DEVELOPMENT = process.env.NEXTAUTH_ENV !== "production";
 
