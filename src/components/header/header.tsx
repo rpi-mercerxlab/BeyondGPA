@@ -3,7 +3,7 @@ import HeaderLoginButton from "./user_info";
 
 export default function Header() {
   return (
-    <header className="bg-primary text-white p-2 w-full flex items-center justify-start">
+    <header className="bg-primary text-white px-2 py-0.5 w-full flex items-center justify-start">
       <Image
         src="/Mercer-X-Logo.png"
         alt="Mercer XLab Logo"

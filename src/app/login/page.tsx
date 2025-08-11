@@ -1,4 +1,4 @@
-import Footer from "@/components/footer";
+import Footer from "@/components/common/footer";
 import Header from "@/components/header/header";
 import DevLogin from "@/components/login/dev_login";
 import ProductionLogin from "@/components/login/prod_login";

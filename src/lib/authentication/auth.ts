@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   RPI_SHIBBOLETH_PROVIDER,
   DEVELOPMENT_PROVIDER,
-} from "@/authentication/providers";
+} from "@/lib/authentication/providers";
 
 const isProduction = process.env.NEXTAUTH_ENV === "production";
 

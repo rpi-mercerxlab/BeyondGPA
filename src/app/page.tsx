@@ -1,5 +1,5 @@
-import Body from "@/components/body";
-import Footer from "@/components/footer";
+import Body from "@/components/Main-Page/body";
+import Footer from "@/components/common/footer";
 import Header from "@/components/header/header";
 
 export default function Home() {
