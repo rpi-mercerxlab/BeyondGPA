@@ -1,108 +1,107 @@
-import { NextApiRequest } from "next";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
 
 export async function POST(
-    request: NextApiRequest,
-    { params }: { params: { project_id: string; tag_id: string } }
+  _: Request,
+  { params }: { params: { project_id: string; tag_id: string } }
 ) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-        return new Response(undefined, { status: 401 });
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return new Response(undefined, { status: 401 });
+  }
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id: params.project_id },
+      include: {
+        contributors: { select: { email: true, role: true } },
+        skillTags: { select: { id: true } },
+      },
+    });
+
+    if (!project) {
+      return new Response("Project Not Found", { status: 404 });
     }
 
-    try {
-        const project = await prisma.project.findUnique({
-            where: { id: params.project_id },
-            include: {
-                contributors: { select: { email: true, role: true } },
-                skillTags: { select: { id: true } },
-            },
-        });
-
-        if (!project) {
-            return new Response("Project Not Found", { status: 404 });
-        }
-
-        if (
-            project.contributors.includes({
-                email: session.user.email,
-                role: "EDITOR",
-            }) === false
-        ) {
-            return new Response(undefined, { status: 403 });
-        }
-
-        if (project.skillTags.includes({ id: params.tag_id }) === true) {
-            return new Response(undefined, { status: 200 });
-        }
-
-        await prisma.project.update({
-            where: { id: params.project_id },
-            data: {
-                skillTags: {
-                    connect: { id: params.tag_id },
-                },
-            },
-        });
-
-        return new Response(undefined, { status: 200 });
-
-    } catch (error) {
-        console.error("Error adding skill tag to project:", error);
-        return new Response(undefined, { status: 500 });
+    if (
+      project.contributors.includes({
+        email: session.user.email,
+        role: "EDITOR",
+      }) === false
+    ) {
+      return new Response(undefined, { status: 403 });
     }
+
+    if (project.skillTags.includes({ id: params.tag_id }) === true) {
+      return new Response(undefined, { status: 200 });
+    }
+
+    await prisma.project.update({
+      where: { id: params.project_id },
+      data: {
+        skillTags: {
+          connect: { id: params.tag_id },
+        },
+      },
+    });
+
+    return new Response(undefined, { status: 200 });
+  } catch (error) {
+    console.error("Error adding skill tag to project:", error);
+    return new Response(undefined, { status: 500 });
+  }
 }
 
 export async function DELETE(
-    request: NextApiRequest,
-    { params }: { params: { project_id: string; tag_id: string } }
+  request: Request,
+  { params }: { params: { project_id: string; tag_id: string } }
 ) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-        return new Response(undefined, { status: 401 });
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return new Response(undefined, { status: 401 });
+  }
+
+  try {
+    const project = await prisma.project.findUnique({
+      where: { id: params.project_id },
+      include: {
+        contributors: { select: { email: true, role: true } },
+        skillTags: { select: { id: true } },
+      },
+    });
+
+    if (!project) {
+      return new Response("Project Not Found", { status: 404 });
     }
 
-    try {
-        const project = await prisma.project.findUnique({
-            where: { id: params.project_id },
-            include: {
-                contributors: { select: { email: true, role: true } },
-                skillTags: { select: { id: true } },
-            },
-        });
-
-        if (!project) {
-            return new Response("Project Not Found", { status: 404 });
-        }
-
-        if (
-            project.contributors.includes({
-                email: session.user.email,
-                role: "EDITOR",
-            }) === false
-        ) {
-            return new Response(undefined, { status: 403 });
-        }
-
-        if (project.skillTags.includes({ id: params.tag_id }) === false) {
-            return new Response("Skill Tag Not Associated with Project", { status: 404 });
-        }
-
-        await prisma.project.update({
-            where: { id: params.project_id },
-            data: {
-                skillTags: {
-                    disconnect: { id: params.tag_id },
-                },
-            },
-        });
-
-        return new Response(undefined, { status: 204 });
-
-    } catch (error) {
-        console.error("Error removing skill tag from project:", error);
-        return new Response(undefined, { status: 500 });
+    if (
+      project.contributors.includes({
+        email: session.user.email,
+        role: "EDITOR",
+      }) === false
+    ) {
+      return new Response(undefined, { status: 403 });
     }
+
+    if (project.skillTags.includes({ id: params.tag_id }) === false) {
+      return new Response("Skill Tag Not Associated with Project", {
+        status: 404,
+      });
+    }
+
+    await prisma.project.update({
+      where: { id: params.project_id },
+      data: {
+        skillTags: {
+          disconnect: { id: params.tag_id },
+        },
+      },
+    });
+
+    return new Response(undefined, { status: 204 });
+  } catch (error) {
+    console.error("Error removing skill tag from project:", error);
+    return new Response(undefined, { status: 500 });
+  }
 }

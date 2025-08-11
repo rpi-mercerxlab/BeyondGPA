@@ -994,8 +994,8 @@ Body:
 
 ```typescript
 {
-  url: string;
-  coverText: string;
+  url: string; // The URL must be a full URL (including http/https) it cannot be relative
+  label: string;
 }
 ```
 
@@ -1010,7 +1010,7 @@ Body:
 ```typescript
 {
 url: string;
-coverText: string;
+label: string;
 id: string;
 } | string | undefined
 ```
@@ -1129,8 +1129,8 @@ Body:
 
 ```typescript
 {
-  url: string;
-  coverText: string;
+  prompt: string;
+  answer: string;
 }
 ```
 
@@ -1144,9 +1144,9 @@ Body:
 
 ```typescript
 {
-url: string;
-coverText: string;
-id: string;
+  prompt: string;
+  answer: string;
+  id: string;
 } | string | undefined
 ```
 
