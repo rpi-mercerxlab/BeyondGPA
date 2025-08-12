@@ -177,11 +177,27 @@ export async function DELETE(
       return new Response("Forbidden", { status: 403 });
     }
 
-    // Delete image from MinIO
-    await minioClient.removeObject(
-      process.env.STUDENT_PROJECT_BUCKET_NAME!,
-      `${params.project_id}/${params.image_id}`
-    );
+    const image = await prisma.image.findUnique({
+      where: {
+        id: params.image_id,
+      },
+      select: {
+        external: true,
+        size: true,
+      },
+    });
+
+    if (!image) {
+      return new Response("Image not found", { status: 404 });
+    }
+
+    if (!image.external) {
+      // If the image is internally stored, we need to delete it from the internal storage
+      await minioClient.removeObject(
+        process.env.STUDENT_PROJECT_BUCKET_NAME!,
+        `${params.project_id}/${params.image_id}`
+      );
+    }
 
     // Delete image record from database
     await prisma.image.delete({
@@ -190,7 +206,27 @@ export async function DELETE(
       },
     });
 
-    return new Response("Image deleted successfully", { status: 200 });
+    const storage_remaining = await prisma.project.update({
+      where: {
+        id: params.project_id,
+      },
+      data: {
+        storageRemaining: {
+          increment: image.size,
+        },
+      },
+      select: {
+        storageRemaining: true,
+      },
+    });
+
+    return new Response(
+      JSON.stringify({ storageRemaining: storage_remaining.storageRemaining }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("Error deleting image:", error);
     return new Response("Internal Server Error", { status: 500 });

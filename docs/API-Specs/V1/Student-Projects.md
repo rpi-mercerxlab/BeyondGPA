@@ -790,6 +790,151 @@ Status:
 - 500: Internal Server Error
   - Body will be undefined
 
+### Add Thumbnail `POST` `/api/v1/project/[project_id]/thumbnail`
+
+Uploads an image to the MinIO database and sets it as the project's thumbnail. Can be called by all project contributors with the editor role.
+
+#### Request
+
+Headers:
+
+- `Content-Type`:
+  - `image/png` for Portable Network Graphics images.
+  - `image/jpeg` for Joint Photographic Experts Group images.
+  - `image/gif` for Graphics Interchange Format images.
+  - `image/svg+xml` for Scalable Vector Graphics images.
+  - `image/webp` for WebP images.
+  - `image/x-icon` for ICO (icon) files.
+  - `application/json` for links to external images.
+
+Query Params:
+None
+
+Body:
+The file object of the image being uploaded. Or
+
+```typescript
+{link: string, alt: string}
+```
+
+if you are adding an external image link.
+
+#### Response
+
+Headers:
+`content-type`: `application/json`
+
+Body:
+
+```typescript
+{
+  id: string;
+  link: string;
+  alt: string;
+  storageRemaining: number; // In bytes
+} | undefined
+```
+
+Status:
+
+- 201: Image Uploaded Successfully
+  - All fields will be populated with relevant info.
+- 400: Bad Request
+  - If the Content-Type of this endpoint is not one of the above this will be returned.
+  - If there are too few bytes remaining in the project's storage quota to upload this image.
+- 401: Unauthorized, the user's session token is missing or invalid
+- 403: The user is not a project contributor for the requested project or does not have the editor role.
+- 404: The requested project does not exist
+- 429: Rate Limit Exceeded.
+- 500: Internal Server Error
+
+### Update Thumbnail Alt Text `PUT` `/api/v1/project/[project_id]/thumbnail`
+
+Updates the alt text for the project's thumbnail image. Can be called by all project contributors with the editor role.
+
+#### Request
+
+Headers:
+`Content-Type`: `application/json`
+
+Query Params:
+None
+Body:
+
+```typescript
+{
+  alt: string;
+}
+```
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{
+  alt?: string;
+}
+```
+
+Status:
+
+- 200: Alt Text Updated Successfully
+  - `alt` will reflect the updated alt text.
+- 401: The authentication token was not provided or was invalid
+  - `alt` will be undefined.
+- 403: The user is not a contributor on the project or does not have the editor role.
+  - `alt` will be undefined.
+- 404: The requested project or image could not be found
+  - `alt` will be undefined.
+- 429: Rate Limit Exceeded.
+- 500: Internal Server Error
+
+### Remove Thumbnail `DELETE` `/api/v1/project/[project_id]/thumbnail`
+
+Deletes the project's thumbnail image from the file storage and disassociates it from the project. Can be called by all project contributors with the editor role.
+
+#### Request
+
+Headers:
+None
+
+Query Params:
+None
+
+Body:
+None
+
+#### Response
+
+Headers:
+
+- `Content-Type`: `application/json`
+
+Body:
+
+```typescript
+{storageRemaining: number} | string | undefined
+```
+
+Status:
+
+- 200: Thumbnail deleted successfully
+  - Body will contain the updated storage remaining amount.
+- 401: The session token is missing or invalid.
+  - Body will be undefined
+- 403: The user is not a contributor on the requested project or does not have the editor role.
+  - Body will be undefined
+- 404: Either the project or image requested does not exist.
+  - Body message will contain either: "Project does not exist" or "Post does not exist"
+- 429: Rate Limit Exceeded.
+- 500: Internal Server Error
+  - Body will be undefined
+
 ### Add Image `POST` `/api/v1/project/[project_id]/image`
 
 Uploads an image to the MinIO database and links it to this project. Can be called by all project contributors with the editor role.
@@ -918,13 +1063,13 @@ Headers:
 Body:
 
 ```typescript
-{message: string} | undefined
+{storageRemaining: number} | string | undefined
 ```
 
 Status:
 
 - 204: Image deleted successfully
-  - Body will be undefined
+  - `storageRemaining` will contain the updated storage remaining amount.
 - 401: The session token is missing or invalid.
   - Body will be undefined
 - 403: The user is not a contributor on the requested project or does not have the editor role.

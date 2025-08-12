@@ -53,6 +53,8 @@ model ThumbnailImage {
     id        String  @id @default(cuid())
     url       String  @default("")
     altText   String  @default("")
+    external  Boolean
+    size      Int
     project   Project @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     projectId String  @unique
 
@@ -64,6 +66,8 @@ model Image {
     id        String  @id @default(cuid())
     url       String  @default("")
     altText   String  @default("")
+    external  Boolean @default(false)
+    size      Int
     project   Project @relation(fields: [projectId], references: [id], onUpdate: Cascade, onDelete: Cascade)
     projectId String
 

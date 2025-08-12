@@ -65,6 +65,8 @@ export async function POST(
           projectId: params.project_id,
           url: link,
           altText: alt,
+          external: true,
+          size: 0,
         },
       });
 
@@ -126,6 +128,8 @@ export async function POST(
         projectId: params.project_id,
         url: `/api/v1/project/${params.project_id}/image/${image_id}`,
         altText: "",
+        external: false,
+        size: obj.size,
       },
     });
 

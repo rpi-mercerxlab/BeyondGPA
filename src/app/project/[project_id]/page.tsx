@@ -1,9 +1,9 @@
-export default function ProjectView({
+export default async function ProjectView({
   params,
 }: {
-  params: { project_id: string };
+  params: Promise<{ project_id: string }>;
 }) {
-  const { project_id } = params;
+  const { project_id } = await params;
 
   return (
     <div>
