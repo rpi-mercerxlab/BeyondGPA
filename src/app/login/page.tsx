@@ -1,5 +1,5 @@
 import Footer from "@/components/common/footer";
-import Header from "@/components/header/header";
+import Header from "@/components/common/header/header";
 import DevLogin from "@/components/login/dev_login";
 import ProductionLogin from "@/components/login/prod_login";
 import { getServerSession } from "next-auth";

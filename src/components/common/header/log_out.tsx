@@ -2,7 +2,7 @@
 
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
-import BeyondButton from "../common/BeyondButton";
+import BeyondButton from "../BeyondButton";
 
 export default function LogOutButton({ session }: { session: Session }) {
   const greeting =

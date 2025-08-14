@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Footer from "@/components/common/footer";
+import Header from "@/components/common/header/header";
 
 export const metadata: Metadata = {
   title: "BeyondGPA",
@@ -15,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={` antialiased bg-bg-base`}
+        className={` antialiased bg-bg-base flex flex-col items-start justify-start min-h-screen text-text-base`}
       >
+        <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );

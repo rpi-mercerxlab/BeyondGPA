@@ -455,6 +455,7 @@ Status:
 ### Update Contributor `PUT` `/api/v1/project/[project_id]/contributor/[contributor_id]`
 
 Updates the name and email of the specified contributor. This can only be performed by the project owner.
+The contributor corresponding to the owner of the project cannot be updated.
 
 #### Request
 
@@ -495,6 +496,8 @@ Status:
 
 - 200: Title Updated Successfully
   - Name and email will be set to the new value
+- 400: If the name or email is invalid or you attempt to update the project owner
+  - Body will be undefined
 - 401: The authentication token was not provided or was invalid
   - Body will be undefined
 - 403: The user is not the owner of the project
@@ -508,6 +511,7 @@ Status:
 ### Delete Contributor `DELETE` `/api/v1/project/[project_id]/contributor/[contributor_id]`
 
 Removes a contributor from the project. This can only be performed by the project owner.
+You cannot remove the owner of the project from the list of contributors.
 
 #### Request
 
@@ -532,6 +536,7 @@ None
 Status:
 
 - 204: Contributor was removed successfully
+- 400: If you try to remove the owner of the project
 - 401: The authentication token was not provided or was invalid
 - 403: The user is not the owner of the project
 - 404: The requested project was not found

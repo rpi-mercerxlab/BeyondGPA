@@ -27,7 +27,7 @@ export async function PUT(
   try {
     const project = await prisma.project.findUnique({
       where: { id: params.project_id },
-      include: { owner: { select: { id: true } } },
+      include: { owner: { select: { id: true, email: true } } },
     });
 
     if (!project) {
@@ -44,6 +44,10 @@ export async function PUT(
 
     if (!contributor) {
       return new Response("Contributor Not Found", { status: 404 });
+    }
+
+    if (contributor.email === project.owner.email) {
+      return new Response("Cannot edit project owner", { status: 400 });
     }
 
     // Check if the contributor is a registered user
@@ -105,6 +109,10 @@ export async function DELETE(
 
     if (!contributor) {
       return new Response("Contributor Not Found", { status: 404 });
+    }
+
+    if (contributor.userId === project.owner.id) {
+      return new Response("Cannot remove project owner", { status: 400 });
     }
 
     await prisma.contributor.delete({
