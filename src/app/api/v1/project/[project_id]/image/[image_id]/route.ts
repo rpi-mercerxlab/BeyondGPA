@@ -5,8 +5,9 @@ import { minioClient } from "@/lib/minio";
 
 export async function GET(
   _: Request,
-  { params }: { params: { project_id: string; image_id: string } }
+  { params }: { params: Promise<{ project_id: string; image_id: string }> }
 ) {
+  const { project_id, image_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -15,7 +16,7 @@ export async function GET(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: {
@@ -41,7 +42,7 @@ export async function GET(
     // Get image content type and length
     const imageMetadata = await minioClient.statObject(
       process.env.STUDENT_PROJECT_BUCKET_NAME!,
-      `${params.project_id}/${params.image_id}`
+      `${project_id}/${image_id}`
     );
     if (!imageMetadata) {
       return new Response("Image not found", { status: 404 });
@@ -53,11 +54,11 @@ export async function GET(
       imageMetadata.metaData["content-type"] || "application/octet-stream"
     );
     headers.set("Content-Length", imageMetadata.size.toString());
-    headers.set("Content-Disposition", `inline; filename="${params.image_id}"`);
+    headers.set("Content-Disposition", `inline; filename="${image_id}"`);
 
     const image = await minioClient.getObject(
       process.env.STUDENT_PROJECT_BUCKET_NAME!,
-      `${params.project_id}/${params.image_id}`
+      `${project_id}/${image_id}`
     );
     if (!image) {
       return new Response("Image not found", { status: 404 });
@@ -84,12 +85,13 @@ export async function PUT(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       project_id: string;
       image_id: string;
-    };
+    }>;
   }
 ) {
+  const { project_id, image_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -98,7 +100,7 @@ export async function PUT(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: {
@@ -127,7 +129,7 @@ export async function PUT(
 
     await prisma.image.update({
       where: {
-        id: params.image_id,
+        id: image_id,
       },
       data: {
         altText: new_alt,
@@ -143,8 +145,9 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { project_id: string; image_id: string } }
+  { params }: { params: Promise<{ project_id: string; image_id: string }> }
 ) {
+  const { project_id, image_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -153,7 +156,7 @@ export async function DELETE(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: {
@@ -179,7 +182,7 @@ export async function DELETE(
 
     const image = await prisma.image.findUnique({
       where: {
-        id: params.image_id,
+        id: image_id,
       },
       select: {
         external: true,
@@ -195,20 +198,20 @@ export async function DELETE(
       // If the image is internally stored, we need to delete it from the internal storage
       await minioClient.removeObject(
         process.env.STUDENT_PROJECT_BUCKET_NAME!,
-        `${params.project_id}/${params.image_id}`
+        `${project_id}/${image_id}`
       );
     }
 
     // Delete image record from database
     await prisma.image.delete({
       where: {
-        id: params.image_id,
+        id: image_id,
       },
     });
 
     const storage_remaining = await prisma.project.update({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       data: {
         storageRemaining: {

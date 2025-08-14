@@ -16,8 +16,9 @@ const acceptedImageTypes = [
 
 export async function POST(
   request: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -25,7 +26,7 @@ export async function POST(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: {
         contributors: { select: { email: true, role: true } },
         storageRemaining: true,
@@ -62,7 +63,7 @@ export async function POST(
 
       const image = await prisma.image.create({
         data: {
-          projectId: params.project_id,
+          projectId: project_id,
           url: link,
           altText: alt,
           external: true,
@@ -72,7 +73,7 @@ export async function POST(
 
       const responseBody = {
         id: image.id,
-        url: `/api/v1/project/${params.project_id}/image/${image.id}`,
+        url: `/api/v1/project/${project_id}/image/${image.id}`,
         altText: image.altText,
         storageRemaining: project.storageRemaining, // External links do not consume storage
       };
@@ -96,7 +97,7 @@ export async function POST(
     try {
       await minioClient.putObject(
         process.env.STUDENT_PROJECT_BUCKET_NAME!,
-        `/${params.project_id}/${image_id}`,
+        `/${project_id}/${image_id}`,
         quotaStream,
         undefined,
         { "Content-Type": request.headers.get("Content-Type") || "" }
@@ -107,7 +108,7 @@ export async function POST(
         try {
           await minioClient.removeObject(
             process.env.STUDENT_PROJECT_BUCKET_NAME!,
-            `/${params.project_id}/${image_id}`
+            `/${project_id}/${image_id}`
           );
         } catch (err) {
           console.error("Error deleting partial object:", err);
@@ -119,14 +120,14 @@ export async function POST(
 
     const obj = await minioClient.statObject(
       process.env.STUDENT_PROJECT_BUCKET_NAME!,
-      `/${params.project_id}/${image_id}`
+      `/${project_id}/${image_id}`
     );
 
     const image = await prisma.image.create({
       data: {
         id: image_id,
-        projectId: params.project_id,
-        url: `/api/v1/project/${params.project_id}/image/${image_id}`,
+        projectId: project_id,
+        url: `/api/v1/project/${project_id}/image/${image_id}`,
         altText: "",
         external: false,
         size: obj.size,
@@ -134,7 +135,7 @@ export async function POST(
     });
 
     await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         storageRemaining: project.storageRemaining - obj.size,
         images: { connect: { id: image.id } },

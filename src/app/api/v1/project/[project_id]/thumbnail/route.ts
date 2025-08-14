@@ -16,8 +16,9 @@ const acceptedImageTypes = [
 
 export async function POST(
   request: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -26,7 +27,7 @@ export async function POST(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: {
@@ -61,7 +62,7 @@ export async function POST(
 
       const thumbnail = await prisma.project.update({
         where: {
-          id: params.project_id,
+          id: project_id,
         },
         data: {
           thumbnail: {
@@ -115,7 +116,7 @@ export async function POST(
     try {
       await minioClient.putObject(
         process.env.STUDENT_PROJECT_BUCKET_NAME!,
-        `/${params.project_id}/${image_id}`,
+        `/${project_id}/${image_id}`,
         quotaStream,
         undefined,
         { "Content-Type": request.headers.get("Content-Type") || "" }
@@ -126,7 +127,7 @@ export async function POST(
         try {
           await minioClient.removeObject(
             process.env.STUDENT_PROJECT_BUCKET_NAME!,
-            `/${params.project_id}/${image_id}`
+            `/${project_id}/${image_id}`
           );
         } catch (err) {
           console.error("Error deleting partial object:", err);
@@ -138,17 +139,17 @@ export async function POST(
 
     const obj = await minioClient.statObject(
       process.env.STUDENT_PROJECT_BUCKET_NAME!,
-      `/${params.project_id}/${image_id}`
+      `/${project_id}/${image_id}`
     );
 
     const image = await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         thumbnail: {
           create: {
             altText: "",
             id: image_id,
-            url: `/api/v1/project/${params.project_id}/image/${image_id}`,
+            url: `/api/v1/project/${project_id}/image/${image_id}`,
             external: false,
             size: obj.size,
           },
@@ -181,8 +182,9 @@ export async function POST(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -190,7 +192,7 @@ export async function PUT(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: { contributors: { select: { email: true, role: true } } },
     });
 
@@ -212,7 +214,7 @@ export async function PUT(
     }
 
     const thumbnail = await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         thumbnail: {
           update: {
@@ -249,8 +251,9 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -258,7 +261,7 @@ export async function DELETE(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: {
         contributors: { select: { email: true, role: true } },
         thumbnail: {
@@ -286,12 +289,12 @@ export async function DELETE(
     if (!project.thumbnail.external) {
       await minioClient.removeObject(
         process.env.STUDENT_PROJECT_BUCKET_NAME!,
-        `${params.project_id}/${project.thumbnail.id}`
+        `${project_id}/${project.thumbnail.id}`
       );
     }
 
     const remaining_size = await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         thumbnail: {
           delete: true,

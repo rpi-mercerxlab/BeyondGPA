@@ -7,12 +7,13 @@ export async function PUT(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       project_id: string;
       question_id: string;
-    };
+    }>;
   }
 ) {
+  const { project_id, question_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -21,7 +22,7 @@ export async function PUT(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: {
@@ -51,7 +52,7 @@ export async function PUT(
 
     await prisma.questionPrompt.update({
       where: {
-        id: params.question_id,
+        id: question_id,
       },
       data: {
         question: prompt,
@@ -59,10 +60,9 @@ export async function PUT(
       },
     });
 
-    return new Response(
-      JSON.stringify({ prompt, answer, id: params.question_id }),
-      { status: 200 }
-    );
+    return new Response(JSON.stringify({ prompt, answer, id: question_id }), {
+      status: 200,
+    });
   } catch (error) {
     console.error("Error updating image alt text:", error);
     return new Response("Internal Server Error", { status: 500 });
@@ -71,8 +71,9 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { project_id: string; question_id: string } }
+  { params }: { params: Promise<{ project_id: string; question_id: string }> }
 ) {
+  const { project_id, question_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -81,7 +82,7 @@ export async function DELETE(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: {
@@ -107,7 +108,7 @@ export async function DELETE(
 
     await prisma.questionPrompt.delete({
       where: {
-        id: params.question_id,
+        id: question_id,
       },
     });
 

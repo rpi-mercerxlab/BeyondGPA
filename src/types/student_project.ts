@@ -1,6 +1,7 @@
 export type StudentProject = {
   project_id: string;
   title: string;
+  visibility: "DRAFT" | "PUBLIC";
   owner: {
     name: string;
     email: string;

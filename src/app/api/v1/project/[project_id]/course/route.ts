@@ -4,8 +4,9 @@ import { getServerSession } from "next-auth";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
@@ -14,7 +15,7 @@ export async function PUT(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: {
@@ -43,7 +44,7 @@ export async function PUT(
 
     await prisma.project.update({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       data: {
         group: new_group,

@@ -4,8 +4,9 @@ import { authOptions } from "@/lib/authentication/auth";
 
 export async function POST(
   _: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(JSON.stringify({ id: undefined }), { status: 401 });
@@ -13,7 +14,7 @@ export async function POST(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       include: { owner: { select: { id: true } } },
     });
 
@@ -26,7 +27,7 @@ export async function POST(
     }
 
     const resp = await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         contributors: {
           create: {},

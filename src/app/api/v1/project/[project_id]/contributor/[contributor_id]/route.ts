@@ -4,8 +4,11 @@ import { authOptions } from "@/lib/authentication/auth";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { project_id: string; contributor_id: string } }
+  {
+    params,
+  }: { params: Promise<{ project_id: string; contributor_id: string }> }
 ) {
+  const { project_id, contributor_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -26,7 +29,7 @@ export async function PUT(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       include: { owner: { select: { id: true, email: true } } },
     });
 
@@ -39,7 +42,7 @@ export async function PUT(
     }
 
     const contributor = await prisma.user.findUnique({
-      where: { id: params.contributor_id },
+      where: { id: contributor_id },
     });
 
     if (!contributor) {
@@ -57,7 +60,7 @@ export async function PUT(
     });
 
     const resp = await prisma.contributor.update({
-      where: { id: params.contributor_id },
+      where: { id: contributor_id },
       data: {
         name: contributor_name,
         email: contributor_email,
@@ -82,8 +85,11 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { project_id: string; contributor_id: string } }
+  {
+    params,
+  }: { params: Promise<{ project_id: string; contributor_id: string }> }
 ) {
+  const { project_id, contributor_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -91,7 +97,7 @@ export async function DELETE(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       include: { owner: { select: { id: true } } },
     });
 
@@ -104,7 +110,7 @@ export async function DELETE(
     }
 
     const contributor = await prisma.contributor.findUnique({
-      where: { id: params.contributor_id },
+      where: { id: contributor_id },
     });
 
     if (!contributor) {
@@ -116,7 +122,7 @@ export async function DELETE(
     }
 
     await prisma.contributor.delete({
-      where: { id: params.contributor_id },
+      where: { id: contributor_id },
     });
 
     return new Response(undefined, { status: 204 });

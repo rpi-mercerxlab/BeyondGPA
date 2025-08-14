@@ -19,9 +19,7 @@ export default function RootLayout({
       <body
         className={` antialiased bg-bg-base flex flex-col items-start justify-start min-h-screen text-text-base`}
       >
-        <Header />
         {children}
-        <Footer />
       </body>
     </html>
   );

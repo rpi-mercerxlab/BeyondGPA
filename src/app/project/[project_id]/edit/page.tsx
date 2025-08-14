@@ -1,4 +1,6 @@
+import Footer from "@/components/common/footer";
 import Header from "@/components/common/header/header";
+import ProjectEditBody from "@/components/ProjectEdit/ProjectEdit";
 import { StudentProject } from "@/types/student_project";
 
 export default async function ProjectEdit({
@@ -7,14 +9,14 @@ export default async function ProjectEdit({
   params: Promise<{ project_id: string }>;
 }) {
   const { project_id } = await params;
-  const project_data: StudentProject = await fetch(
-    `/api/v1/project/${project_id}`
-  ).then((res) => res.json());
 
   return (
-    <div>
+    <div className="w-full h-full flex flex-col items-center justify-start min-h-screen">
       <Header />
-      <a href={`/project/${project_id}`}>Back to Project</a>
+      <div className="flex flex-col items-center justify-start w-2/3 grow shrink basis-auto">
+        <ProjectEditBody project_id={project_id} />
+      </div>
+      <Footer />
     </div>
   );
 }

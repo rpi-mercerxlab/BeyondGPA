@@ -8,7 +8,7 @@ export async function PUT(
 ) {
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response(JSON.stringify({ visibility: undefined }), {
+    return new Response(JSON.stringify("Invalid Session Token"), {
       status: 401,
     });
   }
@@ -16,9 +16,12 @@ export async function PUT(
   const json = await request.json();
   const visibility = json.visibility;
   if (visibility !== "PUBLIC" && visibility !== "DRAFT") {
-    return new Response(JSON.stringify({ visibility: undefined }), {
-      status: 400,
-    });
+    return new Response(
+      JSON.stringify("Visibility must be either 'PUBLIC' or 'DRAFT'"),
+      {
+        status: 400,
+      }
+    );
   }
 
   try {
@@ -28,15 +31,18 @@ export async function PUT(
     });
 
     if (!project) {
-      return new Response(JSON.stringify({ visibility: undefined }), {
+      return new Response(JSON.stringify("Project not found"), {
         status: 404,
       });
     }
 
     if (project.owner.id !== session.user.id) {
-      return new Response(JSON.stringify({ visibility: undefined }), {
-        status: 403,
-      });
+      return new Response(
+        JSON.stringify("Only project owners can update visibility"),
+        {
+          status: 403,
+        }
+      );
     }
 
     await prisma.project.update({
@@ -47,7 +53,7 @@ export async function PUT(
     return new Response(JSON.stringify({ visibility }), { status: 200 });
   } catch (error) {
     console.error("Error updating project visibility:", error);
-    return new Response(JSON.stringify({ visibility: undefined }), {
+    return new Response("Internal Server Error.", {
       status: 500,
     });
   }

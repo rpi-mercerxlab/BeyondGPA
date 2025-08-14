@@ -4,8 +4,9 @@ import { getServerSession } from "next-auth";
 
 export async function POST(
   _: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -14,7 +15,7 @@ export async function POST(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: { select: { email: true, role: true } },
@@ -35,7 +36,7 @@ export async function POST(
 
     const question = await prisma.questionPrompt.create({
       data: {
-        projectId: params.project_id,
+        projectId: project_id,
       },
     });
 

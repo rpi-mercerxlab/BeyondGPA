@@ -3,9 +3,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
 
 export async function GET(
-  _: Request,
-  { params }: { params: { project_id: string } }
+  request: Request,
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(JSON.stringify({ project: undefined }), {
@@ -15,7 +16,7 @@ export async function GET(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: {
         id: true,
         title: true,
@@ -116,8 +117,9 @@ export async function GET(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -125,7 +127,7 @@ export async function DELETE(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: { ownerId: true },
     });
 
@@ -138,7 +140,7 @@ export async function DELETE(
     }
 
     await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: { visibility: "DELETED" },
     });
 

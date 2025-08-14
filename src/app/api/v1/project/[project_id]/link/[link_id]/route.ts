@@ -4,8 +4,9 @@ import { getServerSession } from "next-auth";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { project_id: string; link_id: string } }
+  { params }: { params: Promise<{ project_id: string; link_id: string }> }
 ) {
+  const { project_id, link_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -20,7 +21,7 @@ export async function PUT(
 
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: { select: { email: true, role: true } },
@@ -30,7 +31,6 @@ export async function PUT(
     if (!project) {
       return new Response("Project not found", { status: 404 });
     }
-    
 
     if (
       !project.contributors.some(
@@ -42,7 +42,7 @@ export async function PUT(
 
     await prisma.link.update({
       where: {
-        id: params.link_id,
+        id: link_id,
       },
       data: {
         url,
@@ -50,7 +50,7 @@ export async function PUT(
       },
     });
 
-    return new Response(JSON.stringify({ url, label, id: params.link_id }), {
+    return new Response(JSON.stringify({ url, label, id: link_id }), {
       status: 200,
     });
   } catch (error) {
@@ -70,8 +70,9 @@ function isValidUrl(str: string): boolean {
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { project_id: string; link_id: string } }
+  { params }: { params: Promise<{ project_id: string; link_id: string }> }
 ) {
+  const { project_id, link_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -80,7 +81,7 @@ export async function DELETE(
   try {
     const project = await prisma.project.findUnique({
       where: {
-        id: params.project_id,
+        id: project_id,
       },
       select: {
         contributors: { select: { email: true, role: true } },
@@ -101,7 +102,7 @@ export async function DELETE(
 
     await prisma.link.delete({
       where: {
-        id: params.link_id,
+        id: link_id,
       },
     });
 

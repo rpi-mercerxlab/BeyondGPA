@@ -1,4 +1,3 @@
-import { Request } from "next";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
@@ -26,7 +25,7 @@ export async function POST(request: Request) {
     return new Response(undefined, { status: 403 });
   }
 
-  const skill = request.body.skill;
+  const { skill } = await request.json();
 
   try {
     // Check if skill tag already exists

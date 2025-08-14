@@ -16,7 +16,7 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="flex flex-col items-start justify-start min-h-screen">
+    <div className="flex flex-col items-start justify-start min-h-screen w-full">
       <Header />
       <main className="flex flex-col items-center justify-center w-full grow shrink basis-auto">
         {IS_DEVELOPMENT ? <DevLogin /> : <ProductionLogin />}

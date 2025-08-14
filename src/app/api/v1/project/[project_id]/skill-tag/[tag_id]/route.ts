@@ -4,8 +4,9 @@ import { authOptions } from "@/lib/authentication/auth";
 
 export async function POST(
   _: Request,
-  { params }: { params: { project_id: string; tag_id: string } }
+  { params }: { params: Promise<{ project_id: string; tag_id: string }> }
 ) {
+  const { project_id, tag_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -13,7 +14,7 @@ export async function POST(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       include: {
         contributors: { select: { email: true, role: true } },
         skillTags: { select: { id: true } },
@@ -33,15 +34,15 @@ export async function POST(
       return new Response(undefined, { status: 403 });
     }
 
-    if (project.skillTags.includes({ id: params.tag_id }) === true) {
+    if (project.skillTags.includes({ id: tag_id }) === true) {
       return new Response(undefined, { status: 200 });
     }
 
     await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         skillTags: {
-          connect: { id: params.tag_id },
+          connect: { id: tag_id },
         },
       },
     });
@@ -55,8 +56,9 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { project_id: string; tag_id: string } }
+  { params }: { params: Promise<{ project_id: string; tag_id: string }> }
 ) {
+  const { project_id, tag_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -64,7 +66,7 @@ export async function DELETE(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       include: {
         contributors: { select: { email: true, role: true } },
         skillTags: { select: { id: true } },
@@ -84,17 +86,17 @@ export async function DELETE(
       return new Response(undefined, { status: 403 });
     }
 
-    if (project.skillTags.includes({ id: params.tag_id }) === false) {
+    if (project.skillTags.includes({ id: tag_id }) === false) {
       return new Response("Skill Tag Not Associated with Project", {
         status: 404,
       });
     }
 
     await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         skillTags: {
-          disconnect: { id: params.tag_id },
+          disconnect: { id: tag_id },
         },
       },
     });

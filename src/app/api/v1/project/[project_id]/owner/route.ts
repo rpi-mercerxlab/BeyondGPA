@@ -4,8 +4,9 @@ import { authOptions } from "@/lib/authentication/auth";
 
 export async function PUT(
   request: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const json = await request.json();
   const new_owner_email = json.email;
   if (!new_owner_email) {
@@ -20,7 +21,7 @@ export async function PUT(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: {
         ownerId: true,
         contributors: {
@@ -47,7 +48,7 @@ export async function PUT(
     }
 
     await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         ownerId: new_owner.id,
       },
@@ -60,7 +61,7 @@ export async function PUT(
       )
     ) {
       await prisma.project.update({
-        where: { id: params.project_id },
+        where: { id: project_id },
         data: {
           contributors: {
             create: {
@@ -82,7 +83,7 @@ export async function PUT(
 
     if (contributor && contributor.role !== "EDITOR") {
       await prisma.project.update({
-        where: { id: params.project_id },
+        where: { id: project_id },
         data: {
           contributors: {
             update: {
@@ -96,7 +97,7 @@ export async function PUT(
 
     // Get the updated info
     const updated_project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: {
         owner: {
           select: {

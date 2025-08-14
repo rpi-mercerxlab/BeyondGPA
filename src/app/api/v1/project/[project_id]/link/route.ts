@@ -5,8 +5,9 @@ import { randomUUID } from "node:crypto";
 
 export async function POST(
   request: Request,
-  { params }: { params: { project_id: string } }
+  { params }: { params: Promise<{ project_id: string }> }
 ) {
+  const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(undefined, { status: 401 });
@@ -14,7 +15,7 @@ export async function POST(
 
   try {
     const project = await prisma.project.findUnique({
-      where: { id: params.project_id },
+      where: { id: project_id },
       select: { contributors: { select: { email: true, role: true } } },
     });
 
@@ -33,7 +34,7 @@ export async function POST(
     const link_id = randomUUID();
 
     const updatedProject = await prisma.project.update({
-      where: { id: params.project_id },
+      where: { id: project_id },
       data: {
         links: {
           create: {
