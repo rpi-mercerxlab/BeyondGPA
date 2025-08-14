@@ -1,5 +1,5 @@
-import { SkillTag } from "@/types/student_project";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { SkillTag } from "@/types/student_project";
 
 interface TagSelectorProps {
   availableTags: SkillTag[];
@@ -18,6 +18,9 @@ export default function TagSelector({
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selected, setSelected] = useState<SkillTag[]>([]);
   const [highlightIndex, setHighlightIndex] = useState(0);
+
+  // Track loading states for each tag
+  const [loadingTags, setLoadingTags] = useState<Set<string>>(new Set());
 
   // Debounce search query
   useEffect(() => {
@@ -38,46 +41,60 @@ export default function TagSelector({
 
   const handleSelect = useCallback(
     async (tag: SkillTag) => {
-      // Optimistic update
-      const newSelection = [...selected, tag];
-      setSelected(newSelection);
+      // Optimistic UI update
+      setSelected((prev) => [...prev, tag]);
       setQuery("");
       setHighlightIndex(0);
+      setLoadingTags((prev) => new Set(prev).add(tag.id));
 
       const success = await onTagSelect(tag);
+
+      setLoadingTags((prev) => {
+        const copy = new Set(prev);
+        copy.delete(tag.id);
+        return copy;
+      });
+
       if (!success) {
-        // Rollback if failed
+        // Roll back if failed
         setSelected((prev) => prev.filter((t) => t.id !== tag.id));
       }
     },
-    [selected, onTagSelect]
+    [onTagSelect]
   );
 
   const handleRemove = useCallback(
     async (tag: SkillTag) => {
-      // Optimistic update
-      const newSelection = selected.filter((t) => t.id !== tag.id);
-      setSelected(newSelection);
+      // Optimistic UI update
+      setSelected((prev) => prev.filter((t) => t.id !== tag.id));
+      setLoadingTags((prev) => new Set(prev).add(tag.id));
 
       const success = await onTagDeselect(tag);
+
+      setLoadingTags((prev) => {
+        const copy = new Set(prev);
+        copy.delete(tag.id);
+        return copy;
+      });
+
       if (!success) {
-        // Rollback if failed
+        // Roll back if failed
         setSelected((prev) => [...prev, tag]);
       }
     },
-    [selected, onTagDeselect]
+    [onTagDeselect]
   );
 
   const handleCreate = useCallback(async () => {
     if (debouncedQuery.trim()) {
-      const success = await onCreateTag(debouncedQuery.trim());
-      if (success) {
-        handleSelect(success);
+      const createdTag = await onCreateTag(debouncedQuery.trim());
+      if (createdTag) {
+        handleSelect(createdTag);
         setQuery("");
         setHighlightIndex(0);
       }
     }
-  }, [debouncedQuery, onCreateTag]);
+  }, [debouncedQuery, onCreateTag, handleSelect]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!debouncedQuery && e.key !== "Escape") return;
@@ -104,22 +121,45 @@ export default function TagSelector({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto relative">
+    <div className="w-full max-w-md mx-auto relative bg-bg-base p-2 rounded-md">
       {/* Selected tags */}
       <div className="flex flex-wrap gap-2 mb-2">
         {selected.map((tag) => (
           <span
             key={tag.id}
-            className="px-2 py-1 bg-primary text-white rounded-full text-sm flex items-center gap-1"
+            className="px-2 py-1 bg-primary text-white rounded-sm text-sm flex items-center gap-1"
           >
             {tag.name}
-            <button
-              type="button"
-              className="text-blue-500 hover:text-blue-700"
-              onClick={() => handleRemove(tag)}
-            >
-              ✕
-            </button>
+            {loadingTags.has(tag.id) ? (
+              <svg
+                className="animate-spin h-3 w-3 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+            ) : (
+              <button
+                type="button"
+                className="text-white hover:text-gray-300"
+                onClick={() => handleRemove(tag)}
+              >
+                ✕
+              </button>
+            )}
           </span>
         ))}
       </div>
@@ -130,7 +170,7 @@ export default function TagSelector({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search or create a tag..."
-        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
         onKeyDown={handleKeyDown}
       />
 
@@ -163,7 +203,9 @@ export default function TagSelector({
               Create “{debouncedQuery}”
             </div>
           ) : (
-            <div>You have already selected the tag “{debouncedQuery}”.</div>
+            <div className="px-3 py-2 text-gray-500">
+              You have already selected the tag “{debouncedQuery}”.
+            </div>
           )}
         </div>
       )}

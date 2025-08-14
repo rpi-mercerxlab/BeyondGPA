@@ -10,7 +10,6 @@ import ToolbarButton from "./toolbarButton";
 import {
   Bold,
   Code,
-  CodeXml,
   FileCode,
   Italic,
   List,
@@ -40,12 +39,12 @@ export default function RichTextEditor({
       StarterKit.configure({
         paragraph: {
           HTMLAttributes: {
-            class: "text-sm",
+            class: "text-sm ",
           },
         },
         bold: {
           HTMLAttributes: {
-            class: "font-bold",
+            class: "font-bold text-primary",
           },
         },
         italic: {
@@ -135,7 +134,7 @@ export default function RichTextEditor({
   return (
     <div className="space-y-2 bg-bg-base border border-gray-400 rounded-md w-full">
       {/* Toolbar */}
-      <div className="flex flex-wrap space-x-2 border-b border-gray-200 p-2 ">
+      <div className="flex flex-wrap space-x-2 space-y-2 border-b border-gray-200 px-2 pt-2">
         <ToolbarButton
           isActive={editor.isActive("bold")}
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -204,7 +203,7 @@ export default function RichTextEditor({
           onClick={() => {
             editor.chain().focus().undo().run();
           }}
-          className={`px-2 py-1 rounded ${
+          className={`w-8 h-8 px-2 py-1 rounded ${
             editor.can().undo()
               ? "bg-bg-base border border-gray-300 hover:bg-gray-200 active:bg-primary active:text-white"
               : "bg-gray-100"
@@ -218,7 +217,7 @@ export default function RichTextEditor({
           onClick={() => {
             editor.chain().focus().redo().run();
           }}
-          className={`px-2 py-1 rounded ${
+          className={` w-8 h-8  px-2 py-1 rounded ${
             editor.can().redo()
               ? "bg-bg-base border border-gray-300 hover:bg-gray-200 active:bg-primary active:text-white"
               : "bg-gray-100"

@@ -28,7 +28,7 @@ export default function MultiImageUpload({
 }) {
   const [error, setError] = useState<string | null>(null);
   return (
-    <div className="max-w-sm bg-bg-base p-2">
+    <div className="w-full bg-bg-base p-2">
       {error && (
         <div className="text-red-500 flex items-center space-x-2">
           <span className="bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center mx-2">
@@ -73,7 +73,7 @@ export default function MultiImageUpload({
         </div>
       ))}
       <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center space-y-2">
-        <label>
+        <label className="flex flex-col items-center justify-center cursor-pointer">
           <input
             type="file"
             accept="image/*"
@@ -88,12 +88,12 @@ export default function MultiImageUpload({
               }
             }}
           />
-          <p className="cursor-grab">Click here to upload an image</p>
+          <p className="text-gray-500">Click to upload an image</p>
         </label>
         <input
           type="text"
-          className="border border-gray-300 rounded-md p-2 w-full ml-2 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-          placeholder="Or Paste a link to an Image Here"
+          className="border border-gray-300 rounded-md p-1 px-2 w-fit ml-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          placeholder="Or paste an image URL"
           onBlur={async (e) => {
             const url = e.target.value;
             if (url) {
@@ -105,7 +105,7 @@ export default function MultiImageUpload({
           }}
         />
       </div>
-      <p>
+      <p className="p-2">
         Storage remaining:{" "}
         <span className="font-bold text-primary">
           {storageNumberToString(storageRemaining)}

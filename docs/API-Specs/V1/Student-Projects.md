@@ -1265,7 +1265,7 @@ Status:
 
 ### Update Question `PUT` `/api/v1/project/[project_id]/question/[question_id]`
 
-Updates the prompt or response for a question beloning to a project. Can be called by all contributors to the specified project with the editor role.
+Updates the prompt or response for a question belonging to a project. Can be called by all contributors to the specified project with the editor role.
 
 #### Request
 
