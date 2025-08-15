@@ -19,11 +19,9 @@ export async function PUT(
   const contributor_email = json.email;
   const contributor_role = json.role;
 
-  if (
-    !contributor_name ||
-    !contributor_email ||
-    (contributor_role !== "EDITOR" && contributor_role !== "VIEWER")
-  ) {
+  if (!(contributor_role === "EDITOR" || contributor_role === "VIEWER")) {
+    console.log(contributor_name, contributor_email, contributor_role);
+    console.log(json);
     return new Response("Invalid Request Body", { status: 400 });
   }
 
@@ -41,7 +39,7 @@ export async function PUT(
       return new Response(undefined, { status: 403 });
     }
 
-    const contributor = await prisma.user.findUnique({
+    const contributor = await prisma.contributor.findUnique({
       where: { id: contributor_id },
     });
 

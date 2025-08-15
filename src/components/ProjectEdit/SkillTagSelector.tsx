@@ -121,7 +121,7 @@ export default function TagSelector({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto relative bg-bg-base p-2 rounded-md">
+    <div className="w-full max-w-md mx-auto relative bg-bg-base-100 p-2 rounded-md">
       {/* Selected tags */}
       <div className="flex flex-wrap gap-2 mb-2">
         {selected.map((tag) => (

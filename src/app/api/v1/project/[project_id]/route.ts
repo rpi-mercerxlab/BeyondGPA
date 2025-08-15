@@ -8,11 +8,6 @@ export async function GET(
 ) {
   const { project_id } = await params;
   const session = await getServerSession(authOptions);
-  if (!session) {
-    return new Response(JSON.stringify({ project: undefined }), {
-      status: 401,
-    });
-  }
 
   try {
     const project = await prisma.project.findUnique({
@@ -47,9 +42,9 @@ export async function GET(
     }
 
     if (project.visibility === "DRAFT") {
-      const isOwner = project.owner.email === session.user.email;
+      const isOwner = project.owner.email === session?.user.email;
       const isContributor = project.contributors.some(
-        (contributor) => contributor.email === session.user.email
+        (contributor) => contributor.email === session?.user.email
       );
       if (!isOwner && !isContributor) {
         return new Response(JSON.stringify({ project: undefined }), {
@@ -62,6 +57,7 @@ export async function GET(
       project: {
         project_id: project.id,
         title: project.title,
+        visibility: project.visibility,
         owner: {
           name: `${project.owner.firstName} ${project.owner.lastName}`,
           email: project.owner.email,
@@ -98,8 +94,8 @@ export async function GET(
           id: q.id,
         })),
         group: {
-          name: project.group?.name,
-          id: project.group?.id,
+          name: project.group?.name || "",
+          id: project.group?.id || "",
         },
         created_at: project.createdAt.toISOString(),
         updated_at: project.updatedAt.toISOString(),

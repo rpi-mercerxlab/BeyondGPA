@@ -261,7 +261,7 @@ Status:
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
 
-### Transfer Project Ownership `PUT` `/api/v1/project/[project_id]/owner`
+### Transfer Project Ownership `POST` `/api/v1/project/[project_id]/owner`
 
 Transfers ownership of the project to the user specified. Can only be called by the owner of the project.
 

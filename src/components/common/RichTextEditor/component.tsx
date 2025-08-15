@@ -132,7 +132,7 @@ export default function RichTextEditor({
   }
 
   return (
-    <div className="space-y-2 bg-bg-base border border-gray-400 rounded-md w-full">
+    <div className="space-y-2 bg-bg-base-100 border border-gray-400 rounded-md w-full">
       {/* Toolbar */}
       <div className="flex flex-wrap space-x-2 space-y-2 border-b border-gray-200 px-2 pt-2">
         <ToolbarButton
@@ -205,7 +205,7 @@ export default function RichTextEditor({
           }}
           className={`w-8 h-8 px-2 py-1 rounded ${
             editor.can().undo()
-              ? "bg-bg-base border border-gray-300 hover:bg-gray-200 active:bg-primary active:text-white"
+              ? "bg-bg-base-100 border border-gray-300 hover:bg-gray-200 active:bg-primary active:text-white"
               : "bg-gray-100"
           }`}
           title="Undo"
@@ -219,7 +219,7 @@ export default function RichTextEditor({
           }}
           className={` w-8 h-8  px-2 py-1 rounded ${
             editor.can().redo()
-              ? "bg-bg-base border border-gray-300 hover:bg-gray-200 active:bg-primary active:text-white"
+              ? "bg-bg-base-100 border border-gray-300 hover:bg-gray-200 active:bg-primary active:text-white"
               : "bg-gray-100"
           }`}
           title="Redo"

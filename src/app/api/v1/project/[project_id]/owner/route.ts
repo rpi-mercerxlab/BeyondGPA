@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
 
-export async function PUT(
+export async function POST(
   request: Request,
   { params }: { params: Promise<{ project_id: string }> }
 ) {

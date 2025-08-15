@@ -10,7 +10,7 @@ export default function BeyondButton({
   return (
     <button
       onClick={onClick}
-      className={`bg-primary text-white shadow-md inset-shadow-sm hover:bg-bg-base hover:text-primary p-2 rounded-full active:shadow-none transition-colors${className}`}
+      className={`bg-primary text-white shadow-md inset-shadow-sm hover:bg-bg-base-100 hover:text-primary p-2 rounded-full active:shadow-none transition-colors ${className}`}
     >
       {children}
     </button>

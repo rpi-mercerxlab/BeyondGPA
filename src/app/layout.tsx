@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={` antialiased bg-bg-base flex flex-col items-start justify-start min-h-screen text-text-base`}
+        className={` antialiased bg-bg-base-100 flex flex-col items-start justify-start min-h-screen text-text-base`}
       >
         {children}
       </body>

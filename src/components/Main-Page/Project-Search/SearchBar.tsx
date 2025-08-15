@@ -6,7 +6,10 @@ export default function SearchBar() {
       className="flex items-center space-x-2 w-full shadow-xl rounded-full mt-2"
       onSubmit={(e) => {
         e.preventDefault();
-        console.log("TODO: Call to Search API:", (document.getElementById("project-search")! as HTMLInputElement).value);
+        console.log(
+          "TODO: Call to Search API:",
+          (document.getElementById("project-search")! as HTMLInputElement).value
+        );
       }}
     >
       <div className="w-3"></div>
@@ -26,7 +29,7 @@ export default function SearchBar() {
             cy="15"
             r="8"
             strokeWidth={3}
-            className="fill-bg-base stroke-primary"
+            className="fill-bg-base-100 stroke-primary"
           />
           <line
             x1="21"

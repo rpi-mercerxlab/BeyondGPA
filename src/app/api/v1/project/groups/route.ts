@@ -10,7 +10,7 @@ export async function GET(request: Request) {
         name: true,
       },
     });
-    return new Response(JSON.stringify(groups), { status: 200 });
+    return new Response(JSON.stringify({ groups }), { status: 200 });
   } catch (error) {
     return new Response("Internal Server Error", { status: 500 });
   }

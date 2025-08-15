@@ -85,7 +85,7 @@ export default function SingleImageUpload({
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full bg-bg-base p-2">
+    <div className="flex flex-col space-y-2 w-full bg-bg-base-100 p-2">
       {error && (
         <div className="text-red-500 flex items-center space-x-2">
           <span className="bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center mx-2">
