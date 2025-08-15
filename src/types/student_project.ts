@@ -28,10 +28,7 @@ export type StudentProject = {
     questionText: string;
     answerText: string;
   }[];
-  group: {
-    id: string | undefined;
-    name: string | undefined;
-  };
+  group: Group;
   createdAt: string;
   updatedAt: string;
 };
@@ -44,6 +41,11 @@ export type Contributor = {
 };
 
 export type SkillTag = {
+  id: string;
+  name: string;
+};
+
+export type Group = {
   id: string;
   name: string;
 };
