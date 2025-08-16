@@ -44,25 +44,36 @@ export default function OwnersToolbox({
   const [error, setError] = useState<string | null>(null);
   const [newGroupName, setNewGroupName] = useState<string>("");
 
+  console.log("Available Groups:", availableGroups);
+
   const handleGroupChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const groupId = e.target.value;
     if (groupId === "") {
       const resp = await onSetGroup();
       if (!resp.ok) {
         setError(resp.message || "Failed to unset group");
+        return;
       }
     }
     const resp = await onSetGroup(groupId);
     if (!resp.ok) {
       setError(resp.message || "Failed to set group");
+      return;
     }
+    setError(null);
   };
-
-
 
   return (
     <div className="flex flex-col items-start justify-start w-full shadow p-2 rounded-md">
       <h1 className="text-xl font-bold text-primary">Project Owner Settings</h1>
+      {error && (
+        <div className="text-red-500 flex items-center space-x-2">
+          <span className="bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center mx-2">
+            !
+          </span>
+          {error}. Please try again.
+        </div>
+      )}
       <div className="flex flex-col items-start justify-between w-full p-2">
         <div className="w-full flex items-center justify-between pb-2 border-b border-gray-300">
           <p className="w-fit text-center">Visibility Setting</p>
@@ -73,7 +84,9 @@ export default function OwnersToolbox({
               const result = await setVisibility(visibility);
               if (!result.ok) {
                 setError(result.message || "Failed to update visibility");
+                return;
               }
+              setError(null);
             }}
             value={project.visibility}
           >
@@ -101,7 +114,9 @@ export default function OwnersToolbox({
                   const result = await onUpdateContributor(updatedContributor);
                   if (!result.ok) {
                     setError(result.message || "Failed to update contributor");
+                    return;
                   }
+                  setError(null);
                 }}
               />
               <input
@@ -117,7 +132,9 @@ export default function OwnersToolbox({
                   const result = await onUpdateContributor(updatedContributor);
                   if (!result.ok) {
                     setError(result.message || "Failed to update contributor");
+                    return;
                   }
+                  setError(null);
                 }}
               />
               <select
@@ -131,7 +148,9 @@ export default function OwnersToolbox({
                   const result = await onUpdateContributor(updatedContributor);
                   if (!result.ok) {
                     setError(result.message || "Failed to update contributor");
+                    return;
                   }
+                  setError(null);
                 }}
               >
                 <option value="VIEWER">Viewer</option>
@@ -146,7 +165,9 @@ export default function OwnersToolbox({
                       setError(
                         result.message || "Failed to remove contributor"
                       );
+                      return;
                     }
+                    setError(null);
                   }}
                 >
                   Remove Contributor
@@ -164,7 +185,9 @@ export default function OwnersToolbox({
               const resp = await onAddContributor();
               if (!resp.ok) {
                 setError(resp.message || "Failed to add contributor");
+                return;
               }
+              setError(null);
             }}
           >
             Add Contributor
@@ -186,6 +209,7 @@ export default function OwnersToolbox({
               const result = await transferOwnership(email);
               if (!result.ok) {
                 setError(result.message || "Failed to transfer ownership");
+                return;
               }
             }}
           >
@@ -231,6 +255,7 @@ export default function OwnersToolbox({
                 setError(resp.message || "Failed to create group");
                 return;
               }
+              setError(null);
             }}
           />
         </div>
@@ -248,7 +273,9 @@ export default function OwnersToolbox({
               const result = await onDeleteProject();
               if (!result.ok) {
                 setError(result.message || "Failed to delete project");
+                return;
               }
+              setError(null);
             }}
           >
             Delete
