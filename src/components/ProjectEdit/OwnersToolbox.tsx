@@ -1,5 +1,5 @@
 "use client";
-import { Group } from "@/types/student_project";
+import { Group, ProjectVisibility } from "@/types/student_project";
 import { StudentProject } from "@/types/student_project";
 import { useEffect, useState } from "react";
 import BeyondButton from "../common/BeyondButton";
@@ -20,7 +20,7 @@ export default function OwnersToolbox({
   project: StudentProject;
   availableGroups: Group[];
   setVisibility: (
-    visibility: string
+    visibility: ProjectVisibility
   ) => Promise<{ ok: boolean; message?: string }>;
   transferOwnership: (
     email: string
@@ -81,7 +81,7 @@ export default function OwnersToolbox({
             className="w-fit bg-bg-base-200 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
             onChange={async (e) => {
               const visibility = e.target.value;
-              const result = await setVisibility(visibility);
+              const result = await setVisibility(visibility as ProjectVisibility);
               if (!result.ok) {
                 setError(result.message || "Failed to update visibility");
                 return;

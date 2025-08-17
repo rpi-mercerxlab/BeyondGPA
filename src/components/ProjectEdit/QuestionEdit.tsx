@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import RichTextEditor from "@/components/common/RichTextEditor/component";
+import BeyondButton from "../common/BeyondButton";
 
 const prompts = [
   "What encouraged you to work on this project?",
@@ -15,6 +16,7 @@ export default function QuestionInput({
   answer,
   onPromptChange,
   onAnswerChange,
+  onDelete,
 }: {
   prompt: string;
   answer: string;
@@ -24,6 +26,7 @@ export default function QuestionInput({
   onAnswerChange: (
     answer: string
   ) => Promise<{ ok: boolean; message?: string }>;
+  onDelete: () => Promise<{ ok: boolean; message?: string }>;
 }) {
   const [localPrompt, setLocalPrompt] = useState(prompt);
   const [localAnswer, setLocalAnswer] = useState(answer);
@@ -57,27 +60,37 @@ export default function QuestionInput({
         </div>
       )}
       <div className="flex flex-col w-full">
-        <select
-          onChange={(e) => handlePromptSelect(e.target.value)}
-          className="border border-gray-300 rounded-md p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          defaultValue={
-            customPrompt
-              ? "custom"
-              : localPrompt === ""
-              ? "default"
-              : localPrompt
-          }
-        >
-          <option value="default" disabled>
-            Select a prompt
-          </option>
-          {prompts.map((prompt) => (
-            <option key={prompt} value={prompt}>
-              {prompt}
+        <div>
+          <select
+            onChange={(e) => handlePromptSelect(e.target.value)}
+            className="border border-gray-300 rounded-md p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            defaultValue={
+              customPrompt
+                ? "custom"
+                : localPrompt === ""
+                ? "default"
+                : localPrompt
+            }
+          >
+            <option value="default" disabled>
+              Select a prompt
             </option>
-          ))}
-          <option value="custom">Write your own prompt!</option>
-        </select>
+            {prompts.map((prompt) => (
+              <option key={prompt} value={prompt}>
+                {prompt}
+              </option>
+            ))}
+            <option value="custom">Write your own prompt!</option>
+          </select>
+          <BeyondButton
+            onClick={() => {
+              if (confirm("Are you sure you want to delete this question?"))
+                onDelete();
+            }}
+          >
+            Delete
+          </BeyondButton>
+        </div>
         <input
           type="text"
           value={localPrompt}

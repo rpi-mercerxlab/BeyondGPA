@@ -1,7 +1,7 @@
 "use client";
 
 import { Group, StudentProject } from "@/types/student_project";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import OwnersToolbox from "./OwnersToolbox";
 import {
   addContributor,
@@ -14,12 +14,14 @@ import {
   updateContributor,
   updateTitle,
 } from "@/lib/actions/student_project";
+import ContributorEditableItems from "./ContributorEditableItems";
 
 export default function OwnerProjectEdit({
   project,
 }: {
   project: StudentProject;
 }) {
+  const [clientProject, updateProject] = useState<StudentProject>(project);
   const [groupsFetched, setGroupsFetched] = useState(false);
   const [availableGroups, setAvailableGroups] = useState<Group[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -59,17 +61,28 @@ export default function OwnerProjectEdit({
             defaultValue={project.title}
             onBlur={async (e) => {
               const resp = await updateTitle(project_id, e.target.value);
-              if (!resp.ok) {
-                setError(resp.message);
+              if (resp.ok) {
+                updateProject((prev) => ({
+                  ...prev,
+                  title: e.target.value,
+                }));
               }
+              setError(resp.message);
             }}
           />
           <OwnersToolbox
-            project={project}
+            project={clientProject}
             availableGroups={availableGroups}
-            setVisibility={async (visibility) =>
-              await setVisibility(project.project_id, visibility)
-            }
+            setVisibility={async (visibility) => {
+              const resp = await setVisibility(project.project_id, visibility);
+              if (resp.ok) {
+                updateProject((prev) => ({
+                  ...prev,
+                  visibility,
+                }));
+              }
+              return resp;
+            }}
             transferOwnership={async (email) =>
               await transferOwnership(project.project_id, email)
             }
@@ -83,20 +96,72 @@ export default function OwnerProjectEdit({
             }}
             onSetGroup={async (group_id) => {
               const resp = await assignGroup(project_id, group_id);
-              if (!resp.ok) {
-                return resp;
+              if (resp.ok) {
+                updateProject((prev) => ({
+                  ...prev,
+                  group: resp.group,
+                }));
               }
-              project.group = resp.group;
               return resp;
             }}
             onDeleteProject={async () => await deleteProject(project_id)}
-            onAddContributor={async () => await addContributor(project_id)}
-            onRemoveContributor={async (contributorId) =>
-              await removeContributor(project_id, contributorId)
-            }
-            onUpdateContributor={async (contributor) =>
-              await updateContributor(project_id, contributor)
-            }
+            onAddContributor={async () => {
+              const resp = await addContributor(project_id);
+              if (resp.ok) {
+                updateProject((prev) => ({
+                  ...prev,
+                  contributors: [
+                    ...prev.contributors,
+                    { id: resp.id, name: "", email: "", role: "VIEWER" },
+                  ],
+                }));
+              }
+              return resp;
+            }}
+            onRemoveContributor={async (contributorId) => {
+              const resp = await removeContributor(project_id, contributorId);
+              if (resp.ok) {
+                updateProject((prev) => ({
+                  ...prev,
+                  contributors: prev.contributors.filter(
+                    (c) => c.id !== contributorId
+                  ),
+                }));
+              }
+              return resp;
+            }}
+            onUpdateContributor={async (contributor) => {
+              const resp = await updateContributor(project_id, contributor);
+              if (resp.ok) {
+                updateProject((prev) => ({
+                  ...prev,
+                  contributors: prev.contributors.map((c) =>
+                    c.id === contributor.id ? contributor : c
+                  ),
+                }));
+              }
+              return resp;
+            }}
+          />
+          <ContributorEditableItems
+            project={project}
+            availableSkillTags={availableSkillTags}
+            onThumbnailChange={onThumbnailChange}
+            onThumbnailCaptionChange={onThumbnailCaptionChange}
+            onThumbnailDelete={onThumbnailDelete}
+            onAddImage={onAddImage}
+            onImageCaptionChange={onImageCaptionChange}
+            onImageDelete={onImageDelete}
+            onAddSkillTag={onAddSkillTag}
+            onRemoveSkillTag={onRemoveSkillTag}
+            onCreateSkillTag={onCreateSkillTag}
+            onAddLink={onAddLink}
+            onLinkChange={onLinkChange}
+            onLinkDelete={onLinkDelete}
+            onDescriptionChange={onDescriptionChange}
+            onAddQuestion={onAddQuestion}
+            onQuestionChange={onQuestionChange}
+            onQuestionDelete={onQuestionDelete}
           />
         </div>
       ) : (

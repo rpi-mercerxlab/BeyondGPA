@@ -1,37 +1,43 @@
 export type StudentProject = {
   project_id: string;
   title: string;
-  visibility: "DRAFT" | "PUBLIC";
+  visibility: ProjectVisibility;
   owner: {
     name: string;
     email: string;
   };
   contributors: Contributor[];
   skill_tags: SkillTag[];
-  images: {
-    link: string;
-    caption: string;
-    id: string;
-  }[];
-  thumbnail: {
-    link: string | undefined;
-    caption: string | undefined;
-  };
-  links: {
-    link: string;
-    coverText: string;
-    id: string;
-  }[];
+  images: Image[];
+  thumbnail: Image;
+  links: Link[];
   description: string;
-  questions: {
-    id: string;
-    questionText: string;
-    answerText: string;
-  }[];
+  questions: QuestionPrompt[];
   group: Group;
   createdAt: string;
   updatedAt: string;
+  storageRemaining: number;
 };
+
+export type Image = {
+  id: string;
+  url: string;
+  alt: string;
+};
+
+export type QuestionPrompt = {
+  id: string;
+  question: string;
+  answer: string;
+};
+
+export type Link = {
+  id: string;
+  link: string;
+  coverText: string;
+};
+
+export type ProjectVisibility = "DRAFT" | "PUBLIC" | "DELETED";
 
 export type Contributor = {
   name: string;

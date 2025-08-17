@@ -9,6 +9,8 @@ export async function GET(
   const { project_id } = await params;
   const session = await getServerSession(authOptions);
 
+  console.log(session);
+
   try {
     const project = await prisma.project.findUnique({
       where: { id: project_id },
@@ -32,6 +34,7 @@ export async function GET(
         createdAt: true,
         updatedAt: true,
         group: { select: { id: true, name: true } },
+        storageRemaining: true,
       },
     });
 
@@ -68,10 +71,7 @@ export async function GET(
           id: contributor.id,
           role: contributor.role,
         })),
-        skill_tags: project.skillTags.map((skill) => ({
-          tag: skill.name,
-          id: skill.id,
-        })),
+        skill_tags: project.skillTags,
         images: project.images.map((image) => ({
           link: image.url,
           caption: image.altText,
@@ -97,8 +97,9 @@ export async function GET(
           name: project.group?.name || "",
           id: project.group?.id || "",
         },
-        created_at: project.createdAt.toISOString(),
-        updated_at: project.updatedAt.toISOString(),
+        createdAt: project.createdAt.toISOString(),
+        updatedAt: project.updatedAt.toISOString(),
+        storageRemaining: project.storageRemaining,
       },
     };
 

@@ -1,10 +1,5 @@
+import { Image } from "@/types/student_project";
 import { useState } from "react";
-
-export type Image = {
-  id: string;
-  url: string;
-  alt: string;
-};
 
 export default function MultiImageUpload({
   images,

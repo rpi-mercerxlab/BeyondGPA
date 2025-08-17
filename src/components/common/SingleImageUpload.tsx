@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 interface ImageUploadProps {
   existingImage?: string; // URL of an existing image
-  existingAlt: string; // Existing caption/alt text
+  existingAlt?: string; // Existing caption/alt text
   storageRemaining: number; // Remaining storage in bytes
   onUpload: (file: File) => Promise<{ ok: boolean; message?: string }>; // Called when a new local image is selected
   onAltChange: (altText: string) => Promise<{ ok: boolean; message?: string }>; // Called when caption changes

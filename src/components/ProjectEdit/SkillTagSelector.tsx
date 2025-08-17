@@ -3,9 +3,11 @@ import { SkillTag } from "@/types/student_project";
 
 interface TagSelectorProps {
   availableTags: SkillTag[];
-  onTagSelect: (tag: SkillTag) => Promise<boolean>;
-  onTagDeselect: (tag: SkillTag) => Promise<boolean>;
-  onCreateTag: (tagName: string) => Promise<SkillTag>;
+  onTagSelect: (tag: SkillTag) => Promise<{ ok: boolean; message?: string }>;
+  onTagDeselect: (tag: SkillTag) => Promise<{ ok: boolean; message?: string }>;
+  onCreateTag: (
+    tagName: string
+  ) => Promise<{ ok: boolean; message?: string; tag?: SkillTag }>;
 }
 
 export default function TagSelector({
@@ -89,7 +91,7 @@ export default function TagSelector({
     if (debouncedQuery.trim()) {
       const createdTag = await onCreateTag(debouncedQuery.trim());
       if (createdTag) {
-        handleSelect(createdTag);
+        handleSelect(createdTag.tag!);
         setQuery("");
         setHighlightIndex(0);
       }

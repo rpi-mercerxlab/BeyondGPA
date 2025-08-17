@@ -44,7 +44,10 @@ export async function POST(
       },
     });
 
-    return new Response(JSON.stringify({ id: link_id }), { status: 200 });
+    return new Response(
+      JSON.stringify({ id: link_id, link: "", coverText: "" }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error fetching project:", error);
     return new Response("Internal Server Error", { status: 500 });
