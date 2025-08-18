@@ -82,6 +82,7 @@ export async function POST(
               altText: true,
             },
           },
+          storageRemaining: true,
         },
       });
 
@@ -90,6 +91,7 @@ export async function POST(
           id: thumbnail.thumbnail?.id,
           url: thumbnail.thumbnail?.url,
           altText: thumbnail.thumbnail?.altText,
+          storageRemaining: thumbnail.storageRemaining,
         }),
         {
           status: 201,
@@ -153,6 +155,9 @@ export async function POST(
             external: false,
             size: obj.size,
           },
+        },
+        storageRemaining: {
+          decrement: obj.size,
         },
       },
       select: {
@@ -309,7 +314,7 @@ export async function DELETE(
     });
 
     return new Response(
-      JSON.stringify({ storage_remaining: remaining_size.storageRemaining }),
+      JSON.stringify({ storageRemaining: remaining_size.storageRemaining }),
       {
         status: 200,
         headers: { "Content-Type": "application/json" },

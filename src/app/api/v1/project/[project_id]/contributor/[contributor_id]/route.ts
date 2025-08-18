@@ -20,8 +20,6 @@ export async function PUT(
   const contributor_role = json.role;
 
   if (!(contributor_role === "EDITOR" || contributor_role === "VIEWER")) {
-    console.log(contributor_name, contributor_email, contributor_role);
-    console.log(json);
     return new Response("Invalid Request Body", { status: 400 });
   }
 
@@ -48,7 +46,10 @@ export async function PUT(
     }
 
     if (contributor.email === project.owner.email) {
-      return new Response("Cannot edit project owner", { status: 400 });
+      return new Response(
+        "Cannot edit the collaborator info for the project owner.",
+        { status: 400 }
+      );
     }
 
     // Check if the contributor is a registered user

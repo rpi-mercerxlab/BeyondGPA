@@ -1,6 +1,10 @@
 import { authOptions } from "@/lib/authentication/auth";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import createDOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+
+const domPurify = createDOMPurify(new JSDOM().window);
 
 export async function PUT(
   request: Request,
@@ -47,8 +51,27 @@ export async function PUT(
     }
 
     const reqJSON = await request.json();
-    const prompt = reqJSON.prompt;
+    const prompt = reqJSON.question;
     const answer = reqJSON.answer;
+
+    const sanitizedAnswer = domPurify.sanitize(answer, {
+      ALLOWED_TAGS: [
+        "b",
+        "i",
+        "u",
+        "sup",
+        "sub",
+        "em",
+        "strong",
+        "p",
+        "ul",
+        "ol",
+        "li",
+        "pre",
+        "code",
+      ],
+      ALLOWED_ATTR: ["class"],
+    });
 
     await prisma.questionPrompt.update({
       where: {
@@ -56,13 +79,16 @@ export async function PUT(
       },
       data: {
         question: prompt,
-        answer: answer,
+        answer: sanitizedAnswer,
       },
     });
 
-    return new Response(JSON.stringify({ prompt, answer, id: question_id }), {
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({ prompt, answer: sanitizedAnswer, id: question_id }),
+      {
+        status: 200,
+      }
+    );
   } catch (error) {
     console.error("Error updating image alt text:", error);
     return new Response("Internal Server Error", { status: 500 });

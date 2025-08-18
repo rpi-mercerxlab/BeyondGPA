@@ -1,6 +1,6 @@
 "use client";
 
-import BeyondButton from "@/components/common/BeyondButton";
+import BeyondButton from "@/components/common/BeyondComponents/BeyondButton";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

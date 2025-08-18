@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import RichTextEditor from "@/components/common/RichTextEditor/component";
-import BeyondButton from "../common/BeyondButton";
+import BeyondButton from "../common/BeyondComponents/BeyondButton";
+import BeyondLineEdit from "../common/BeyondComponents/BeyondLineEdit";
 
 const prompts = [
   "What encouraged you to work on this project?",
@@ -33,24 +34,22 @@ export default function QuestionInput({
   const [customPrompt, setCustomPrompt] = useState(
     !prompts.some((p) => p === prompt) && prompt !== ""
   );
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | undefined>("");
 
-  const handlePromptSelect = async (selectedPrompt: string) => {
+  console.log(prompt);
+
+  const handlePromptSelect = (selectedPrompt: string) => {
     if (selectedPrompt === "custom") {
       setCustomPrompt(true);
       setLocalPrompt("");
     } else {
       setLocalPrompt(selectedPrompt);
       setCustomPrompt(false);
-      const resp = await onPromptChange(selectedPrompt);
-      if (!resp.ok) {
-        setError(resp.message || "Failed to save prompt");
-      }
     }
   };
 
   return (
-    <div className="w-full mx-auto bg-bg-base-100 p-2 rounded-md">
+    <div className="w-full mx-auto bg-bg-base-100 py-2 rounded-md">
       {error && (
         <div className="text-red-500 flex items-center space-x-2">
           <span className="bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center mx-2">
@@ -60,11 +59,11 @@ export default function QuestionInput({
         </div>
       )}
       <div className="flex flex-col w-full">
-        <div>
+        <div className="flex w-full justify-between mb-0.5">
           <select
             onChange={(e) => handlePromptSelect(e.target.value)}
             className="border border-gray-300 rounded-md p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-primary"
-            defaultValue={
+            value={
               customPrompt
                 ? "custom"
                 : localPrompt === ""
@@ -83,22 +82,23 @@ export default function QuestionInput({
             <option value="custom">Write your own prompt!</option>
           </select>
           <BeyondButton
+            className="h-8 flex items-center"
             onClick={() => {
               if (confirm("Are you sure you want to delete this question?"))
                 onDelete();
             }}
           >
-            Delete
+            Delete Question
           </BeyondButton>
         </div>
-        <input
-          type="text"
+        <BeyondLineEdit
           value={localPrompt}
-          onChange={(e) => {
-            setLocalPrompt(e.target.value);
+          onChange={async (value) => {
+            const resp = await onPromptChange(value);
+            setError(resp.message);
           }}
           disabled={!customPrompt}
-          className="disabled:bg-gray-100 rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-primary mb-2"
+          className="disabled:bg-gray-100 rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-primary mb-2 w-full"
         />
       </div>
       <RichTextEditor

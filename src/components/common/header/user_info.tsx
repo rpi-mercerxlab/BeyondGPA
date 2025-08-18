@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
 import LogOutButton from "./log_out";
-import BeyondButtonLink from "../BeyondButtonLink";
+import BeyondButtonLink from "../BeyondComponents/BeyondButtonLink";
 
 export default async function HeaderLoginButton() {
   const session = await getServerSession(authOptions);

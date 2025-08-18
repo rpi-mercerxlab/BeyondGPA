@@ -2,8 +2,9 @@
 import { Group, ProjectVisibility } from "@/types/student_project";
 import { StudentProject } from "@/types/student_project";
 import { useEffect, useState } from "react";
-import BeyondButton from "../common/BeyondButton";
+import BeyondButton from "../common/BeyondComponents/BeyondButton";
 import { Contributor } from "@/types/student_project";
+import BeyondLineEdit from "../common/BeyondComponents/BeyondLineEdit";
 
 export default function OwnersToolbox({
   project,
@@ -42,9 +43,7 @@ export default function OwnersToolbox({
   ) => Promise<{ ok: boolean; message?: string }>;
 }) {
   const [error, setError] = useState<string | null>(null);
-  const [newGroupName, setNewGroupName] = useState<string>("");
 
-  console.log("Available Groups:", availableGroups);
 
   const handleGroupChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const groupId = e.target.value;
@@ -81,7 +80,9 @@ export default function OwnersToolbox({
             className="w-fit bg-bg-base-200 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
             onChange={async (e) => {
               const visibility = e.target.value;
-              const result = await setVisibility(visibility as ProjectVisibility);
+              const result = await setVisibility(
+                visibility as ProjectVisibility
+              );
               if (!result.ok) {
                 setError(result.message || "Failed to update visibility");
                 return;
@@ -101,15 +102,14 @@ export default function OwnersToolbox({
               className="w-full flex items-center justify-between"
               key={contributor.id}
             >
-              <input
-                className="w-fit bg-bg-base-200 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                type="text"
+              <BeyondLineEdit
+                className="text-sm text-black font-normal"
                 placeholder="Contributor Name"
-                defaultValue={contributor.name}
-                onBlur={async (e) => {
+                value={contributor.name}
+                onChange={async (value) => {
                   const updatedContributor = {
                     ...contributor,
-                    name: e.target.value,
+                    name: value,
                   };
                   const result = await onUpdateContributor(updatedContributor);
                   if (!result.ok) {
@@ -119,15 +119,13 @@ export default function OwnersToolbox({
                   setError(null);
                 }}
               />
-              <input
-                className="w-fit bg-bg-base-200 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-                type="email"
+              <BeyondLineEdit
                 placeholder="Contributor Email"
-                defaultValue={contributor.email}
-                onBlur={async (e) => {
+                value={contributor.email}
+                onChange={async (value) => {
                   const updatedContributor = {
                     ...contributor,
-                    email: e.target.value,
+                    email: value,
                   };
                   const result = await onUpdateContributor(updatedContributor);
                   if (!result.ok) {
@@ -243,14 +241,12 @@ export default function OwnersToolbox({
             ))}
           </select>
           <p className="font-bold text-primary mb-0">OR</p>
-          <input
-            className="w-fit bg-bg-base-200 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-            type="text"
+          <BeyondLineEdit
             placeholder="Create a new group"
-            onChange={(e) => setNewGroupName(e.target.value)}
-            onBlur={async () => {
-              if (newGroupName.trim() === "") return;
-              const resp = await onCreateGroup(newGroupName);
+            value=""
+            onChange={async (value) => {
+              if (value.trim() === "") return;
+              const resp = await onCreateGroup(value);
               if (!resp.ok) {
                 setError(resp.message || "Failed to create group");
                 return;

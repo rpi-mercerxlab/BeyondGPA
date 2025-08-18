@@ -1,5 +1,6 @@
 import { Image } from "@/types/student_project";
 import { useState } from "react";
+import BeyondLineEdit from "./BeyondComponents/BeyondLineEdit";
 
 export default function MultiImageUpload({
   images,
@@ -35,7 +36,7 @@ export default function MultiImageUpload({
       {images.map((image) => (
         <div
           key={image.id}
-          className="flex items-center space-y-2 border-b border-primary mb-2"
+          className="flex items-start space-y-2 border-b border-primary mb-2 h-fit"
         >
           <div className="relative w-1/3">
             <img src={image.url} alt={image.alt} className="" />
@@ -53,18 +54,20 @@ export default function MultiImageUpload({
               &times;
             </button>
           </div>
-          <input
-            className="border border-gray-300 rounded-md p-2 w-full ml-2 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
-            type="text"
-            value={image.alt}
-            placeholder="Image Caption"
-            onChange={async (e) => {
-              const result = await onAltChange(image.id, e.target.value);
-              if (!result.ok) {
-                setError(result.message || "Alt text change failed");
-              }
-            }}
-          />
+          <div className="w-2/3 flex items-start justify-center h-full p-2">
+            <BeyondLineEdit
+              key={image.id}
+              value={image.alt}
+              placeholder="Image Caption"
+              className="w-full"
+              onChange={async (value) => {
+                const result = await onAltChange(image.id, value);
+                if (!result.ok) {
+                  setError(result.message || "Alt text change failed");
+                }
+              }}
+            />
+          </div>
         </div>
       ))}
       <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center space-y-2">
@@ -85,19 +88,19 @@ export default function MultiImageUpload({
           />
           <p className="text-gray-500">Click to upload an image</p>
         </label>
-        <input
-          type="text"
-          className="border border-gray-300 rounded-md p-1 px-2 w-fit ml-2 focus:outline-none focus:ring-2 focus:ring-primary"
+        <BeyondLineEdit
+          key="link"
           placeholder="Or paste an image URL"
-          onBlur={async (e) => {
-            const url = e.target.value;
-            if (url) {
-              const result = await onLink(url);
+          onChange={async (value) => {
+            if (value) {
+              const result = await onLink(value);
               if (!result.ok) {
                 setError(result.message || "Linking image failed");
               }
             }
           }}
+          value=""
+          className="w-full"
         />
       </div>
       <p className="p-2">

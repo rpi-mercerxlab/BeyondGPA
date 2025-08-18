@@ -1,4 +1,9 @@
-import { Contributor, Link, QuestionPrompt } from "@/types/student_project";
+import {
+  Contributor,
+  Link,
+  QuestionPrompt,
+  SkillTag,
+} from "@/types/student_project";
 import { redirect } from "next/navigation";
 
 export const setVisibility = async (project_id: string, visibility: string) => {
@@ -170,7 +175,7 @@ export const updateThumbnail = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ thumbnail }),
+      body: JSON.stringify({ image: thumbnail }),
     });
   } else {
     res = await fetch(`/api/v1/project/${project_id}/thumbnail`, {
@@ -218,10 +223,18 @@ export const deleteThumbnail = async (project_id: string) => {
   });
 
   if (!res.ok) {
-    return { ok: false, message: await res.text() };
+    return {
+      ok: false,
+      message: await res.text(),
+      storageRemaining: undefined,
+    };
   }
 
-  return { ok: true, message: undefined };
+  return {
+    ok: true,
+    message: undefined,
+    storageRemaining: (await res.json()).storageRemaining,
+  };
 };
 
 type ImageResponse = {
@@ -288,10 +301,18 @@ export const deleteImage = async (project_id: string, imageId: string) => {
   });
 
   if (!res.ok) {
-    return { ok: false, message: await res.text() };
+    return {
+      ok: false,
+      message: await res.text(),
+      storageRemaining: undefined,
+    };
   }
 
-  return { ok: true, message: undefined };
+  return {
+    ok: true,
+    message: undefined,
+    storageRemaining: (await res.json()).storageRemaining,
+  };
 };
 
 export const createLink = async (project_id: string) => {
@@ -405,6 +426,62 @@ export const deleteQuestion = async (
 ) => {
   const res = await fetch(
     `/api/v1/project/${project_id}/question/${questionId}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!res.ok) {
+    return { ok: false, message: await res.text() };
+  }
+
+  return { ok: true, message: undefined };
+};
+
+export const createSkillTag = async (name: string) => {
+  const res = await fetch(`/api/v1/project/skill-tags`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ skill: name }),
+  });
+
+  if (!res.ok) {
+    return { ok: false, message: await res.text(), tag: undefined };
+  }
+
+  return { ok: true, message: undefined, tag: (await res.json()) as SkillTag };
+};
+
+export const assignSkillTagToProject = async (
+  project_id: string,
+  skill_id: string
+) => {
+  const res = await fetch(
+    `/api/v1/project/${project_id}/skill-tag/${skill_id}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ skill_id }),
+    }
+  );
+
+  if (!res.ok) {
+    return { ok: false, message: await res.text() };
+  }
+
+  return { ok: true, message: undefined };
+};
+
+export const removeSkillTagFromProject = async (
+  project_id: string,
+  skill_id: string
+) => {
+  const res = await fetch(
+    `/api/v1/project/${project_id}/skill-tag/${skill_id}`,
     {
       method: "DELETE",
     }

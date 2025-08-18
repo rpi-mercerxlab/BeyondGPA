@@ -26,15 +26,14 @@ export async function POST(
     }
 
     if (
-      project.contributors.includes({
-        email: session.user.email,
-        role: "EDITOR",
-      }) === false
+      project.contributors.some(
+        (c) => c.email === session.user.email && c.role === "EDITOR"
+      ) === false
     ) {
       return new Response(undefined, { status: 403 });
     }
 
-    if (project.skillTags.includes({ id: tag_id }) === true) {
+    if (project.skillTags.some((t) => t.id === tag_id)) {
       return new Response(undefined, { status: 200 });
     }
 

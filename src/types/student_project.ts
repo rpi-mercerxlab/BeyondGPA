@@ -9,7 +9,7 @@ export type StudentProject = {
   contributors: Contributor[];
   skill_tags: SkillTag[];
   images: Image[];
-  thumbnail: Image;
+  thumbnail: Image | undefined | null;
   links: Link[];
   description: string;
   questions: QuestionPrompt[];

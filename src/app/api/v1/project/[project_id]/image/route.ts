@@ -49,32 +49,26 @@ export async function POST(
     }
 
     if (request.headers.get("Content-Type")?.startsWith("application/json")) {
-      const body = await request.json();
-      const link = body.link;
-      const alt = body.alt;
+      const reqJSON = await request.json();
+      const image = reqJSON.image;
 
-      if (typeof link !== "string" || link.length === 0 || link.length > 2048) {
-        return new Response("Invalid Link", { status: 400 });
+      if (!image) {
+        return new Response("Image data is required", { status: 400 });
       }
 
-      if (typeof alt !== "string" || alt.length > 256) {
-        return new Response("Invalid Alt Text", { status: 400 });
-      }
-
-      const image = await prisma.image.create({
+      const resp = await prisma.image.create({
         data: {
           projectId: project_id,
-          url: link,
-          altText: alt,
+          url: image,
           external: true,
           size: 0,
         },
       });
 
       const responseBody = {
-        id: image.id,
-        url: `/api/v1/project/${project_id}/image/${image.id}`,
-        altText: image.altText,
+        id: resp.id,
+        url: resp.url,
+        altText: resp.altText,
         storageRemaining: project.storageRemaining, // External links do not consume storage
       };
 

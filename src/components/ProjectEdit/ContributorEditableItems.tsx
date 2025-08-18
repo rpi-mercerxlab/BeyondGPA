@@ -8,11 +8,12 @@ import {
 } from "@/types/student_project";
 import SingleImageUpload from "../common/SingleImageUpload";
 import MultiImageUpload from "../common/MultiImageUpload";
-import BeyondButton from "../common/BeyondButton";
+import BeyondButton from "../common/BeyondComponents/BeyondButton";
 import TagSelector from "./SkillTagSelector";
 import RichTextEditor from "../common/RichTextEditor/component";
 import { useState } from "react";
 import QuestionInput from "./QuestionEdit";
+import BeyondLineEdit from "../common/BeyondComponents/BeyondLineEdit";
 
 export default function ContributorEditableItems({
   project,
@@ -38,45 +39,53 @@ export default function ContributorEditableItems({
   availableSkillTags: SkillTag[];
   onThumbnailChange: (
     thumbnail: File | string
-  ) => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string; url?: string }>;
   onThumbnailCaptionChange: (
     newCaption: string
-  ) => Promise<{ ok: boolean; message: string }>;
-  onThumbnailDelete: () => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string }>;
+  onThumbnailDelete: () => Promise<{ ok: boolean; message?: string }>;
   onAddImage: (
     image: File | string
-  ) => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string }>;
   onImageCaptionChange: (
     imageId: string,
     newCaption: string
-  ) => Promise<{ ok: boolean; message: string }>;
-  onImageDelete: (imageId: string) => Promise<{ ok: boolean; message: string }>;
-  onAddSkillTag: (tag: SkillTag) => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string }>;
+  onImageDelete: (
+    imageId: string
+  ) => Promise<{ ok: boolean; message?: string }>;
+  onAddSkillTag: (tag: SkillTag) => Promise<{ ok: boolean; message?: string }>;
   onRemoveSkillTag: (
     tag: SkillTag
-  ) => Promise<{ ok: boolean; message: string }>;
-  onCreateSkillTag: (name: string) => Promise<{ ok: boolean; message: string }>;
-  onAddLink: () => Promise<{ ok: boolean; message: string }>;
-  onLinkChange: (newLink: Link) => Promise<{ ok: boolean; message: string }>;
-  onLinkDelete: (linkId: string) => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string }>;
+  onCreateSkillTag: (
+    name: string
+  ) => Promise<{ ok: boolean; message?: string }>;
+  onAddLink: () => Promise<{ ok: boolean; message?: string }>;
+  onLinkChange: (newLink: Link) => Promise<{ ok: boolean; message?: string }>;
+  onLinkDelete: (linkId: string) => Promise<{ ok: boolean; message?: string }>;
   onDescriptionChange: (
     newDescription: string
-  ) => Promise<{ ok: boolean; message: string }>;
-  onAddQuestion: () => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string }>;
+  onAddQuestion: () => Promise<{ ok: boolean; message?: string }>;
   onQuestionChange: (
     newQuestion: QuestionPrompt
-  ) => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string }>;
   onQuestionDelete: (
     questionId: string
-  ) => Promise<{ ok: boolean; message: string }>;
+  ) => Promise<{ ok: boolean; message?: string }>;
 }) {
   const [description, setDescription] = useState(project.description);
 
+  console.log(project);
+
   return (
     <div>
-      <div>
-        <div>
-          <h1>Thumbnail</h1>
+      <div className="flex w-full space-x-4">
+        <div className="w-1/2">
+          <h1 className="text-xl font-bold text-primary w-full border-b border-primary">
+            Project Thumbnail: What makes your project stand out?
+          </h1>
           <SingleImageUpload
             existingImage={project.thumbnail?.url}
             existingAlt={project.thumbnail?.alt}
@@ -87,8 +96,10 @@ export default function ContributorEditableItems({
             storageRemaining={project.storageRemaining}
           />
         </div>
-        <div>
-          <h1>Images</h1>
+        <div className="w-1/2">
+          <h1 className="text-xl font-bold text-primary w-full border-b border-primary">
+            A picture is worth a thousand words, add them here.
+          </h1>
           <MultiImageUpload
             images={project.images}
             storageRemaining={project.storageRemaining}
@@ -98,50 +109,71 @@ export default function ContributorEditableItems({
             onLink={onAddImage}
           />
         </div>
-        <div>
-          <h1>Links</h1>
+      </div>
+      <div className="flex w-full space-x-4 my-4">
+        <div className="w-1/2">
+          <h1 className="text-xl font-bold text-primary w-full border-b border-primary mb-1">
+            Are there any relevant links to include?
+          </h1>
           {project.links.map((link) => (
-            <div key={link.id}>
-              <input
-                type="text"
+            <div
+              key={link.id}
+              className="flex w-full space-x-2 space-y-2 mb-1 pb-1 flex-wrap border-b border-primary"
+            >
+              <BeyondLineEdit
                 value={link.link}
-                onChange={(e) =>
-                  onLinkChange({ ...link, link: e.target.value })
-                }
+                onChange={(value) => {
+                  onLinkChange({ ...link, link: value });
+                }}
+                placeholder="Link URL"
               />
-              <input
-                type="text"
+              <BeyondLineEdit
                 value={link.coverText}
-                onChange={(e) =>
-                  onLinkChange({ ...link, coverText: e.target.value })
-                }
+                onChange={(value) => {
+                  onLinkChange({ ...link, coverText: value });
+                }}
+                placeholder="Link Cover Text"
               />
-              <BeyondButton onClick={() => onLinkDelete(link.id)}>
-                Delete
+              <BeyondButton
+                onClick={() => onLinkDelete(link.id)}
+                className="h-8 flex items-center"
+              >
+                Delete Link
               </BeyondButton>
             </div>
           ))}
-          <BeyondButton onClick={onAddLink}>Add Link</BeyondButton>
+          <BeyondButton onClick={onAddLink} className="h-8 flex items-center">
+            Add Link
+          </BeyondButton>
         </div>
-        <div>
-          <h1>Tags</h1>
+        <div className="w-1/2">
+          <h1 className="text-xl font-bold text-primary w-full border-b border-primary">
+            What skills did you use in this project?
+          </h1>
           <TagSelector
             availableTags={availableSkillTags}
             onTagSelect={onAddSkillTag}
             onTagDeselect={onRemoveSkillTag}
             onCreateTag={onCreateSkillTag}
+            existingTags={project.skill_tags}
           />
         </div>
       </div>
-      <h1>Description</h1>
+      <h1 className="text-xl font-bold text-primary w-full border-b border-primary">
+        Tell us about your project, the more detail the better.
+      </h1>
       <RichTextEditor
         onChange={setDescription}
         content={description}
         onBlur={() => onDescriptionChange(description)}
       />
-      <h1>Questions</h1>
+      <h1 className="text-xl font-bold text-primary w-full border-b border-primary pt-4">
+        Elaborate further: What did you learn, what challenges did you face, and
+        what would you do differently?
+      </h1>
       {project.questions.map((question) => (
         <QuestionInput
+          key={question.id}
           prompt={question.question}
           answer={question.answer}
           onAnswerChange={(newAnswer) =>
@@ -153,6 +185,9 @@ export default function ContributorEditableItems({
           onDelete={() => onQuestionDelete(question.id)}
         />
       ))}
+      <BeyondButton onClick={onAddQuestion} className="h-8 flex items-center">
+        Add Question
+      </BeyondButton>
     </div>
   );
 }

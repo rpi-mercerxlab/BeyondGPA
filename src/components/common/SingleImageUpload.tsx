@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import BeyondLineEdit from "./BeyondComponents/BeyondLineEdit";
 
 interface ImageUploadProps {
   existingImage?: string; // URL of an existing image
   existingAlt?: string; // Existing caption/alt text
   storageRemaining: number; // Remaining storage in bytes
-  onUpload: (file: File) => Promise<{ ok: boolean; message?: string }>; // Called when a new local image is selected
+  onUpload: (
+    file: File
+  ) => Promise<{ ok: boolean; message?: string; url?: string }>; // Called when a new local image is selected
   onAltChange: (altText: string) => Promise<{ ok: boolean; message?: string }>; // Called when caption changes
   onDelete: () => Promise<{ ok: boolean; message?: string }>; // Called when image is deleted
   onUrlChange: (url: string) => Promise<{ ok: boolean; message?: string }>; // Called when an external image URL is specified
@@ -19,40 +22,26 @@ export default function SingleImageUpload({
   onDelete,
   onUrlChange,
 }: ImageUploadProps) {
-  const [image, setImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string>(existingImage || "");
   const [preview, setPreview] = useState<string | null>(existingImage || null);
   const [altText, setAltText] = useState<string>(existingAlt);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (image) {
-      const reader = new FileReader();
-      reader.onloadend = () => setPreview(reader.result as string);
-      reader.readAsDataURL(image);
-    } else {
-      setPreview(null);
-    }
-  }, [image, imageUrl]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
-      setImageUrl("");
       const result = await onUpload(file);
       if (!result.ok) {
         setError(result.message || "Upload failed");
-        setImage(null);
       } else {
         setError(null);
+        setPreview(result.url!);
       }
     }
   };
 
-  const handleAltChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAltText(e.target.value);
-    const resp = await onAltChange(e.target.value);
+  const handleAltChange = async (value: string) => {
+    const resp = await onAltChange(value);
     if (!resp.ok) {
       setError(resp.message || "Alt text change failed");
     } else {
@@ -60,10 +49,9 @@ export default function SingleImageUpload({
     }
   };
 
-  const handleUrlChange = async () => {
-    setImage(null); // clear local image
-    setPreview(imageUrl);
-    const resp = await onUrlChange(imageUrl);
+  const handleUrlChange = async (value: string) => {
+    setPreview(value);
+    const resp = await onUrlChange(value);
     if (!resp.ok) {
       setError(resp.message || "URL change failed");
     } else {
@@ -72,10 +60,8 @@ export default function SingleImageUpload({
   };
 
   const handleDelete = async () => {
-    setImage(null);
-    setImageUrl("");
-    setPreview(null);
     setAltText("");
+    setPreview(null);
     const resp = await onDelete();
     if (!resp.ok) {
       setError(resp.message || "Delete failed");
@@ -96,12 +82,12 @@ export default function SingleImageUpload({
       )}
       <div className="border border-dashed border-gray-300 rounded-lg p-4 flex flex-row items-center justify-center space-y-2">
         {preview ? (
-          <div className="flex flex-col items-center space-y-2">
+          <div className="flex flex-col items-center space-y-2 w-full">
             <div className="relative">
               <img
                 src={preview}
                 alt={altText || "Uploaded preview"}
-                className="object- rounded-lg"
+                className=" h-fit rounded-lg"
               />
               <button
                 type="button"
@@ -113,12 +99,12 @@ export default function SingleImageUpload({
                 &times;
               </button>
             </div>
-            <input
-              type="text"
+            <BeyondLineEdit
+              key="caption"
+              className="w-full!"
               value={altText}
               onChange={handleAltChange}
               placeholder="Enter image caption"
-              className="border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
         ) : (
@@ -132,16 +118,11 @@ export default function SingleImageUpload({
                 onChange={handleFileChange}
               />
             </label>
-            {/* External URL input */}
-            <input
-              type="text"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              onBlur={() => {
-                handleUrlChange();
-              }}
+            <BeyondLineEdit
+              key="url"
+              value=""
+              onChange={handleUrlChange}
               placeholder="Or paste an image URL"
-              className="border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
         )}

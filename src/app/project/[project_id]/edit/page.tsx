@@ -45,7 +45,7 @@ export default async function ProjectEdit({
     },
   });
 
-  if (!projectData) {
+  if (!projectData || projectData.visibility === "DELETED") {
     // TODO: 404 Page Needed
     return <div>Error loading project</div>;
   }
@@ -66,8 +66,8 @@ export default async function ProjectEdit({
     })),
     skill_tags: projectData.skillTags,
     images: projectData.images.map((image) => ({
-      link: image.url,
-      caption: image.altText,
+      url: image.url,
+      alt: image.altText,
       id: image.id,
     })),
     links: projectData.links.map((link) => ({
@@ -76,11 +76,13 @@ export default async function ProjectEdit({
       id: link.id,
     })),
     description: projectData.description,
-    thumbnail: {
-      link: projectData.thumbnail?.url,
-      caption: projectData.thumbnail?.altText,
-      id: projectData.thumbnail?.id,
-    },
+    thumbnail: projectData.thumbnail
+      ? {
+          url: projectData.thumbnail.url,
+          alt: projectData.thumbnail.altText,
+          id: projectData.thumbnail.id!,
+        }
+      : null,
     questions: projectData.questionPrompts.map((q) => ({
       question: q.question,
       answer: q.answer,

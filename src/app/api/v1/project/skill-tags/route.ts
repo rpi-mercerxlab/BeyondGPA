@@ -8,7 +8,7 @@ export async function GET(_: Request) {
       orderBy: { name: "asc" },
     });
 
-    return new Response(JSON.stringify(skillTags), { status: 200 });
+    return new Response(JSON.stringify({ tags: skillTags }), { status: 200 });
   } catch (error) {
     console.error("Error fetching skill tags:", error);
     return new Response(undefined, { status: 500 });

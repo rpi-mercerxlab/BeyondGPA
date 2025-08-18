@@ -15,7 +15,6 @@ export async function POST(request: Request) {
   const user: User = await request.json();
   const email = user.email;
 
-  console.log(user);
 
   const resp = await prisma.user.upsert({
     where: { email },

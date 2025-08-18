@@ -64,7 +64,7 @@ export default function RichTextEditor({
         },
         codeBlock: {
           HTMLAttributes: {
-            class: "font-mono bg-gray-100 p-2 rounded-md w-full",
+            class: "font-mono bg-gray-100 p-2 my-4 rounded-md w-full",
           },
         },
         bulletList: {

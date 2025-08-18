@@ -94,7 +94,7 @@ export async function POST(_: Request) {
     });
   }
 
-  if (session.user.role !== "student" && session.user.role !== "faculty") {
+  if (session.user.role !== "student") {
     return new Response(JSON.stringify({ project_id: undefined }), {
       status: 403,
     });

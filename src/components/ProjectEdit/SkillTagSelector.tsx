@@ -3,6 +3,7 @@ import { SkillTag } from "@/types/student_project";
 
 interface TagSelectorProps {
   availableTags: SkillTag[];
+  existingTags: SkillTag[];
   onTagSelect: (tag: SkillTag) => Promise<{ ok: boolean; message?: string }>;
   onTagDeselect: (tag: SkillTag) => Promise<{ ok: boolean; message?: string }>;
   onCreateTag: (
@@ -11,15 +12,17 @@ interface TagSelectorProps {
 }
 
 export default function TagSelector({
-  availableTags,
+  availableTags, // All tags available
+  existingTags, // Tags already assigned to this project
   onTagSelect,
   onTagDeselect,
   onCreateTag,
 }: TagSelectorProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [selected, setSelected] = useState<SkillTag[]>([]);
+  const [selected, setSelected] = useState<SkillTag[]>(existingTags);
   const [highlightIndex, setHighlightIndex] = useState(0);
+
 
   // Track loading states for each tag
   const [loadingTags, setLoadingTags] = useState<Set<string>>(new Set());
@@ -123,7 +126,7 @@ export default function TagSelector({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto relative bg-bg-base-100 p-2 rounded-md">
+    <div className="w-full mx-auto relative bg-bg-base-100 p-2 rounded-md">
       {/* Selected tags */}
       <div className="flex flex-wrap gap-2 mb-2">
         {selected.map((tag) => (
@@ -184,7 +187,7 @@ export default function TagSelector({
               <div
                 key={tag.id}
                 className={`px-3 py-2 cursor-pointer ${
-                  idx === highlightIndex ? "bg-blue-100" : "hover:bg-blue-50"
+                  idx === highlightIndex ? "bg-red-100" : "hover:bg-red-50"
                 }`}
                 onMouseEnter={() => setHighlightIndex(idx)}
                 onClick={() => handleSelect(tag)}
@@ -197,8 +200,8 @@ export default function TagSelector({
             ) ? (
             <div
               className={`px-3 py-2 cursor-pointer ${
-                highlightIndex === 0 ? "bg-blue-100" : "hover:bg-blue-50"
-              } text-blue-600`}
+                highlightIndex === 0 ? "bg-red-100" : "hover:bg-red-50"
+              } text-red-600`}
               onMouseEnter={() => setHighlightIndex(0)}
               onClick={handleCreate}
             >

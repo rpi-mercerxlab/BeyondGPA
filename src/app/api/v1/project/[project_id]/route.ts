@@ -9,7 +9,6 @@ export async function GET(
   const { project_id } = await params;
   const session = await getServerSession(authOptions);
 
-  console.log(session);
 
   try {
     const project = await prisma.project.findUnique({
@@ -38,7 +37,7 @@ export async function GET(
       },
     });
 
-    if (!project) {
+    if (!project || project.visibility === "DELETED") {
       return new Response(JSON.stringify({ project: undefined }), {
         status: 404,
       });
