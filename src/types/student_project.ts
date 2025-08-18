@@ -7,7 +7,7 @@ export type StudentProject = {
     email: string;
   };
   contributors: Contributor[];
-  skill_tags: SkillTag[];
+  skillTags: SkillTag[];
   images: Image[];
   thumbnail: Image | undefined | null;
   links: Link[];
@@ -17,6 +17,16 @@ export type StudentProject = {
   createdAt: string;
   updatedAt: string;
   storageRemaining: number;
+};
+
+export type StudentProjectPreview = {
+  project_id: string;
+  title: string;
+  description: string;
+  thumbnail: Image | undefined | null;
+  contributors: string[];
+  skillTags: string[];
+  group: string | undefined | null;
 };
 
 export type Image = {

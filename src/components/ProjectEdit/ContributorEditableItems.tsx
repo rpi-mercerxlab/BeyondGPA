@@ -155,7 +155,7 @@ export default function ContributorEditableItems({
             onTagSelect={onAddSkillTag}
             onTagDeselect={onRemoveSkillTag}
             onCreateTag={onCreateSkillTag}
-            existingTags={project.skill_tags}
+            existingTags={project.skillTags}
           />
         </div>
       </div>

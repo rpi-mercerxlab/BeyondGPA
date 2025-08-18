@@ -29,6 +29,7 @@ export default async function ProjectEdit({
       thumbnail: { select: { url: true, altText: true, id: true } },
       contributors: {
         select: { name: true, email: true, id: true, role: true },
+        orderBy: { createdAt: "asc" },
       },
       skillTags: { select: { name: true, id: true } },
       images: {
@@ -64,7 +65,7 @@ export default async function ProjectEdit({
       id: contributor.id,
       role: contributor.role,
     })),
-    skill_tags: projectData.skillTags,
+    skillTags: projectData.skillTags,
     images: projectData.images.map((image) => ({
       url: image.url,
       alt: image.altText,

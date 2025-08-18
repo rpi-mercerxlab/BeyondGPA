@@ -180,7 +180,7 @@ export default function ContributorProjectEdit({
               if (resp.ok) {
                 updateProject((prev) => ({
                   ...prev!,
-                  skill_tags: [...prev.skill_tags, newTag],
+                  skillTags: [...prev.skillTags, newTag],
                 }));
               }
               return resp;
@@ -190,7 +190,7 @@ export default function ContributorProjectEdit({
               if (resp.ok) {
                 updateProject((prev) => ({
                   ...prev!,
-                  skill_tags: prev.skill_tags.filter((t) => t.id !== tag.id),
+                  skillTags: prev.skillTags.filter((t) => t.id !== tag.id),
                 }));
               }
               return resp;
@@ -200,7 +200,7 @@ export default function ContributorProjectEdit({
               if (resp.ok) {
                 updateProject((prev) => ({
                   ...prev!,
-                  skill_tags: [...prev.skill_tags, resp.tag!],
+                  skillTags: [...prev.skillTags, resp.tag!],
                 }));
                 setAvailableSkillTags((prev) => [...prev, resp.tag!]);
               }

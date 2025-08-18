@@ -3,8 +3,37 @@ import {
   Link,
   QuestionPrompt,
   SkillTag,
+  StudentProjectPreview,
 } from "@/types/student_project";
 import { redirect } from "next/navigation";
+
+export const searchProjects = async (
+  keywords: string[],
+  skills: string[],
+  groups: string[]
+) => {
+  const queryParams = new URLSearchParams();
+  keywords.forEach((keyword) => queryParams.append("keywords", keyword));
+  skills.forEach((skill) => queryParams.append("skills", skill));
+  groups.forEach((group) => queryParams.append("groups", group));
+
+  const response = await fetch(`/api/v1/project?${queryParams.toString()}`);
+  if (!response.ok) {
+    return {
+      ok: false,
+      message: await response.text(),
+      projects: [],
+      paginationToken: undefined,
+    };
+  }
+
+  const projects = await response.json();
+  return {
+    ok: true,
+    projects: projects.projects as StudentProjectPreview[],
+    paginationToken: projects.paginationToken as string,
+  };
+};
 
 export const setVisibility = async (project_id: string, visibility: string) => {
   const response = await fetch(`/api/v1/project/${project_id}/visibility`, {
@@ -333,7 +362,7 @@ export const updateLink = async (project_id: string, link: Link) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(link),
+    body: JSON.stringify({ url: link.link, label: link.coverText }),
   });
 
   if (!res.ok) {

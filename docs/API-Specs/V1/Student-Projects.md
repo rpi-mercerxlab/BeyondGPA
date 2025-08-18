@@ -90,8 +90,6 @@ Status:
   - The list will have at least one item. If there are more items than the limit, a pagination token will be provided, otherwise it will be undefined.
 - 400: If there are too many keywords, majors, skill tags etc. (> 10 items in each category)
   - List will be empty and token will be undefined.
-- 404: There were no projects found that satisfied all of the requested properties.
-  - List will be empty.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
   - List will be empty.

@@ -43,7 +43,7 @@ export default function OwnersToolbox({
   ) => Promise<{ ok: boolean; message?: string }>;
 }) {
   const [error, setError] = useState<string | null>(null);
-
+  const [newGroupName, setNewGroupName] = useState<string>("");
 
   const handleGroupChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const groupId = e.target.value;
@@ -241,19 +241,29 @@ export default function OwnersToolbox({
             ))}
           </select>
           <p className="font-bold text-primary mb-0">OR</p>
-          <BeyondLineEdit
-            placeholder="Create a new group"
-            value=""
-            onChange={async (value) => {
-              if (value.trim() === "") return;
-              const resp = await onCreateGroup(value);
-              if (!resp.ok) {
-                setError(resp.message || "Failed to create group");
-                return;
-              }
-              setError(null);
-            }}
-          />
+          <div className="flex items-center space-x-2">
+            <BeyondLineEdit
+              placeholder="Create a new group"
+              value={newGroupName}
+              onChange={setNewGroupName}
+              debounceDuration={20}
+            />
+            <BeyondButton
+              className="text-base h-8 flex items-center"
+              onClick={async () => {
+                if (newGroupName.trim() === "") return;
+                const resp = await onCreateGroup(newGroupName);
+                if (!resp.ok) {
+                  setError(resp.message || "Failed to create group");
+                  return;
+                }
+                setNewGroupName("");
+                setError(null);
+              }}
+            >
+              Create Group
+            </BeyondButton>
+          </div>
         </div>
         <div className="w-full flex items-center justify-between pt-2">
           <p>Delete Project</p>

@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
+import { group } from "console";
 
 export async function GET(request: Request) {
   try {
@@ -10,7 +11,7 @@ export async function GET(request: Request) {
 
     const skills: string[] = url.searchParams.get("skills")?.split(",") || [];
     const groups: string[] = url.searchParams.get("groups")?.split(",") || [];
-    
+
     const limit = Math.min(
       parseInt(url.searchParams.get("limit") || "24"),
       100
@@ -26,13 +27,49 @@ export async function GET(request: Request) {
     }
 
     const resp = await prisma.project.findMany({
-      where: filterQueryFactory(keywords, skills, groups),
+      where: {
+        AND: [
+          {
+            visibility: { equals: "PUBLIC" },
+          },
+          groups.length > 0
+            ? {
+                group: {
+                  name: {
+                    in: groups,
+                    mode: "insensitive",
+                  },
+                },
+              }
+            : {},
+          skills.length > 0
+            ? {
+                skillTags: {
+                  some: {
+                    name: {
+                      in: skills,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+              }
+            : {},
+          keywords.length > 0
+            ? {
+                OR: keywords.flatMap((keyword) => [
+                  { title: { contains: keyword, mode: "insensitive" } },
+                  { description: { contains: keyword, mode: "insensitive" } },
+                ]),
+              }
+            : {},
+        ],
+      },
       select: {
         id: true,
         title: true,
         description: true,
-        thumbnail: { select: { url: true, altText: true } },
-        contributors: { select: { name: true } },
+        thumbnail: { select: { url: true, altText: true, id: true } },
+        contributors: { select: { name: true }, orderBy: { createdAt: "asc" } },
         skillTags: { select: { name: true } },
         group: { select: { name: true } },
       },
@@ -40,17 +77,6 @@ export async function GET(request: Request) {
       cursor: token ? { id: token } : undefined,
       orderBy: { createdAt: "desc" },
     });
-
-    if (resp.length === 0) {
-      const responseBody = {
-        paginationToken: undefined,
-        projects: [],
-      };
-      return new Response(JSON.stringify(responseBody), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
 
     let nextToken: string | undefined = undefined;
     if (resp.length > limit) {
@@ -64,10 +90,13 @@ export async function GET(request: Request) {
         project_id: project.id,
         title: project.title,
         description: project.description,
-        thumbnail: {
-          link: project.thumbnail?.url,
-          caption: project.thumbnail?.altText,
-        },
+        thumbnail: project.thumbnail
+          ? {
+              id: project.thumbnail.id,
+              url: project.thumbnail.url,
+              alt: project.thumbnail.altText,
+            }
+          : null,
         contributors: project.contributors.map(
           (contributor) => contributor.name
         ),
@@ -138,8 +167,11 @@ function filterQueryFactory(
         visibility: { equals: "PUBLIC" },
       },
       {
-        groupName: {
-          in: groups.length > 0 ? groups : undefined,
+        group: {
+          name: {
+            in: groups.length > 0 ? groups : undefined,
+            mode: "insensitive",
+          },
         },
       },
       {

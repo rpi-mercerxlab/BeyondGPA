@@ -9,7 +9,6 @@ export async function GET(
   const { project_id } = await params;
   const session = await getServerSession(authOptions);
 
-
   try {
     const project = await prisma.project.findUnique({
       where: { id: project_id },
@@ -21,6 +20,7 @@ export async function GET(
         thumbnail: { select: { url: true, altText: true, id: true } },
         contributors: {
           select: { name: true, email: true, id: true, role: true },
+          orderBy: { createdAt: "desc" },
         },
         skillTags: { select: { name: true, id: true } },
         images: {
@@ -36,6 +36,8 @@ export async function GET(
         storageRemaining: true,
       },
     });
+
+    console.log(project?.contributors);
 
     if (!project || project.visibility === "DELETED") {
       return new Response(JSON.stringify({ project: undefined }), {
