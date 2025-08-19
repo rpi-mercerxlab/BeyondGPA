@@ -7,6 +7,7 @@ import ProjectsList from "./ProjectsList";
 import { useEffect, useState } from "react";
 import { StudentProjectPreview } from "@/types/student_project";
 import { searchProjects } from "@/lib/actions/student_project";
+import Modal from "@/components/common/ModalBox";
 
 export default function ProjectSearch() {
   const [found_projects, setFoundProjects] = useState<StudentProjectPreview[]>(
@@ -24,6 +25,7 @@ export default function ProjectSearch() {
     skills: [],
     groups: [],
   });
+  const [demoWarningVisible, setDemoWarningVisible] = useState(true);
 
   async function performSearch(params: {
     keywords: string[];
@@ -70,6 +72,29 @@ export default function ProjectSearch() {
   return (
     <div>
       <SessionProvider>
+        <Modal
+          isOpen={demoWarningVisible}
+          onClose={() => setDemoWarningVisible(false)}
+        >
+          <div className="p-4">
+            <h2 className="text-xl font-semibold text-primary">
+              Welcome to the BeyondGPA Demo!
+            </h2>
+            <p className="mt-2">
+              BeyondGPA is still in its early stages of development. We will do
+              our best to maintain compatibility, but that may not always be
+              possible. Do not store important information here. We welcome any
+              and all feedback, suggestions, or bug reports.
+              <br />
+              <a
+                href="https://github.com/rpi-mercerxlab/BeyondGPA/issues/new"
+                className="text-primary hover:underline"
+              >
+                Provide Feedback Here.
+              </a>
+            </p>
+          </div>
+        </Modal>
         <SearchBar onSearch={handleSimpleSearch} />
         <AdvancedSearch onSearch={performSearch} />
         <ProjectsList projects={found_projects} loadMore={loadMore} />
