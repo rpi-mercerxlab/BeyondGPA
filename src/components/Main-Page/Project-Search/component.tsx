@@ -15,6 +15,15 @@ export default function ProjectSearch() {
   const [paginationToken, setPaginationToken] = useState<string | undefined>(
     undefined
   );
+  const [searchQuery, setSearchQuery] = useState<{
+    keywords: string[];
+    skills: string[];
+    groups: string[];
+  }>({
+    keywords: [],
+    skills: [],
+    groups: [],
+  });
 
   async function performSearch(params: {
     keywords: string[];
@@ -22,6 +31,7 @@ export default function ProjectSearch() {
     groups: string[];
   }) {
     const { keywords, skills, groups } = params;
+    setSearchQuery({ keywords, skills, groups });
     const result = await searchProjects(keywords, skills, groups);
     if (result.ok) {
       setFoundProjects(result.projects);
@@ -33,7 +43,12 @@ export default function ProjectSearch() {
 
   async function loadMore() {
     if (!paginationToken) return;
-    const result = await searchProjects([], [], [], paginationToken);
+    const result = await searchProjects(
+      searchQuery.keywords,
+      searchQuery.skills,
+      searchQuery.groups,
+      paginationToken
+    );
     if (result.ok) {
       setFoundProjects((prev) => [...prev, ...result.projects]);
       setPaginationToken(result.paginationToken);
@@ -44,6 +59,7 @@ export default function ProjectSearch() {
 
   async function handleSimpleSearch(query: string) {
     const keywords = query.split(" ").filter(Boolean).splice(0, 10);
+    setSearchQuery({ keywords, skills: [], groups: [] });
     performSearch({ keywords, skills: [], groups: [] });
   }
 

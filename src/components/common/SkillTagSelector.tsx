@@ -4,9 +4,10 @@ import { SkillTag } from "@/types/student_project";
 interface TagSelectorProps {
   availableTags: SkillTag[];
   existingTags: SkillTag[];
+  allowTagCreation: boolean;
   onTagSelect: (tag: SkillTag) => Promise<{ ok: boolean; message?: string }>;
   onTagDeselect: (tag: SkillTag) => Promise<{ ok: boolean; message?: string }>;
-  onCreateTag: (
+  onCreateTag?: (
     tagName: string
   ) => Promise<{ ok: boolean; message?: string; tag?: SkillTag }>;
 }
@@ -17,12 +18,12 @@ export default function TagSelector({
   onTagSelect,
   onTagDeselect,
   onCreateTag,
+  allowTagCreation,
 }: TagSelectorProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [selected, setSelected] = useState<SkillTag[]>(existingTags);
   const [highlightIndex, setHighlightIndex] = useState(0);
-
 
   // Track loading states for each tag
   const [loadingTags, setLoadingTags] = useState<Set<string>>(new Set());
@@ -91,8 +92,9 @@ export default function TagSelector({
   );
 
   const handleCreate = useCallback(async () => {
+    if (!allowTagCreation) return;
     if (debouncedQuery.trim()) {
-      const createdTag = await onCreateTag(debouncedQuery.trim());
+      const createdTag = await onCreateTag!(debouncedQuery.trim());
       if (createdTag) {
         handleSelect(createdTag.tag!);
         setQuery("");
@@ -126,9 +128,9 @@ export default function TagSelector({
   };
 
   return (
-    <div className="w-full mx-auto relative bg-bg-base-100 p-2 rounded-md">
+    <div className="w-full mx-auto relative bg-bg-base-100 px-2 rounded-md h-fit">
       {/* Selected tags */}
-      <div className="flex flex-wrap gap-2 mb-2">
+      <div className="flex flex-wrap gap-2 mb-2 mt-1">
         {selected.map((tag) => (
           <span
             key={tag.id}
@@ -174,14 +176,14 @@ export default function TagSelector({
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search or create a tag..."
+        placeholder="Search Tags"
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
         onKeyDown={handleKeyDown}
       />
 
       {/* Dropdown */}
       {debouncedQuery && (
-        <div className="absolute w-full mt-1 border rounded-md bg-white shadow-md max-h-40 overflow-y-auto z-10">
+        <div className="mt-1 border rounded-md bg-white shadow-md max-h-40 overflow-y-auto z-10">
           {filteredTags.length > 0 ? (
             filteredTags.map((tag, idx) => (
               <div
@@ -198,15 +200,21 @@ export default function TagSelector({
           ) : !selected.some(
               (t) => t.name.toLowerCase() === debouncedQuery.toLowerCase()
             ) ? (
-            <div
-              className={`px-3 py-2 cursor-pointer ${
-                highlightIndex === 0 ? "bg-red-100" : "hover:bg-red-50"
-              } text-red-600`}
-              onMouseEnter={() => setHighlightIndex(0)}
-              onClick={handleCreate}
-            >
-              Create “{debouncedQuery}”
-            </div>
+            allowTagCreation ? (
+              <div
+                className={`px-3 py-2 cursor-pointer ${
+                  highlightIndex === 0 ? "bg-red-100" : "hover:bg-red-50"
+                } text-red-600`}
+                onMouseEnter={() => setHighlightIndex(0)}
+                onClick={handleCreate}
+              >
+                Create “{debouncedQuery}”
+              </div>
+            ) : (
+              <div className="px-3 py-2 text-gray-500">
+                Tag "{debouncedQuery}" does not exist.
+              </div>
+            )
           ) : (
             <div className="px-3 py-2 text-gray-500">
               You have already selected the tag “{debouncedQuery}”.

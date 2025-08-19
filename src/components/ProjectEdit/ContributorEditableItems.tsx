@@ -9,7 +9,7 @@ import {
 import SingleImageUpload from "../common/SingleImageUpload";
 import MultiImageUpload from "../common/MultiImageUpload";
 import BeyondButton from "../common/BeyondComponents/BeyondButton";
-import TagSelector from "./SkillTagSelector";
+import TagSelector from "../common/SkillTagSelector";
 import RichTextEditor from "../common/RichTextEditor/component";
 import { useState } from "react";
 import QuestionInput from "./QuestionEdit";
@@ -156,6 +156,7 @@ export default function ContributorEditableItems({
             onTagDeselect={onRemoveSkillTag}
             onCreateTag={onCreateSkillTag}
             existingTags={project.skillTags}
+            allowTagCreation={true}
           />
         </div>
       </div>
