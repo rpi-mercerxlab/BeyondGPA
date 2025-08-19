@@ -32,14 +32,13 @@ export default function ProjectSearch() {
   }
 
   async function loadMore() {
-    if (paginationToken) {
-      const result = await searchProjects([], [], [], paginationToken);
-      if (result.ok) {
-        setFoundProjects((prev) => [...prev, ...result.projects]);
-        setPaginationToken(result.paginationToken);
-      } else {
-        // Handle error
-      }
+    if (!paginationToken) return;
+    const result = await searchProjects([], [], [], paginationToken);
+    if (result.ok) {
+      setFoundProjects((prev) => [...prev, ...result.projects]);
+      setPaginationToken(result.paginationToken);
+    } else {
+      // Handle error
     }
   }
 
@@ -56,8 +55,8 @@ export default function ProjectSearch() {
     <div>
       <SessionProvider>
         <SearchBar onSearch={handleSimpleSearch} />
-        <AdvancedSearch />
-        <ProjectsList projects={found_projects} />
+        <AdvancedSearch onSearch={performSearch} />
+        <ProjectsList projects={found_projects} loadMore={loadMore} />
       </SessionProvider>
     </div>
   );

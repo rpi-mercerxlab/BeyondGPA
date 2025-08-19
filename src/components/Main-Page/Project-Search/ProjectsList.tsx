@@ -1,12 +1,38 @@
 "use client";
 
 import { StudentProjectPreview } from "@/types/student_project";
+import { useRef, useEffect } from "react";
 
 export default function ProjectsList({
   projects,
+  loadMore,
 }: {
   projects: StudentProjectPreview[];
+  loadMore: () => void;
 }) {
+  const loaderRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          loadMore();
+        }
+      },
+      { root: null, rootMargin: "200px", threshold: 0 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
       {projects.map((project) => (
@@ -36,7 +62,9 @@ export default function ProjectsList({
               </p>
             </div>
             <div className="flex items-center border-b border-primary">
-              <h3 className="text-sm font-semibold text-primary mr-1">Skills:</h3>
+              <h3 className="text-sm font-semibold text-primary mr-1">
+                Skills:
+              </h3>
               <p className="truncate text-sm">{project.skillTags.join(", ")}</p>
             </div>
             <p
@@ -46,6 +74,8 @@ export default function ProjectsList({
           </div>
         </a>
       ))}
+      {/* Sentinel div for infinite scroll */}
+      <div ref={loaderRef} style={{ height: "1px" }} />
     </div>
   );
 }
