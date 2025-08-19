@@ -31,6 +31,23 @@ export default function ProjectSearch() {
     }
   }
 
+  async function loadMore() {
+    if (paginationToken) {
+      const result = await searchProjects([], [], [], paginationToken);
+      if (result.ok) {
+        setFoundProjects((prev) => [...prev, ...result.projects]);
+        setPaginationToken(result.paginationToken);
+      } else {
+        // Handle error
+      }
+    }
+  }
+
+  async function handleSimpleSearch(query: string) {
+    const keywords = query.split(" ").filter(Boolean).splice(0, 10);
+    performSearch({ keywords, skills: [], groups: [] });
+  }
+
   useEffect(() => {
     performSearch({ keywords: [], skills: [], groups: [] });
   }, []);
@@ -38,7 +55,7 @@ export default function ProjectSearch() {
   return (
     <div>
       <SessionProvider>
-        <SearchBar />
+        <SearchBar onSearch={handleSimpleSearch} />
         <AdvancedSearch />
         <ProjectsList projects={found_projects} />
       </SessionProvider>

@@ -1,15 +1,19 @@
 "use client";
 
-export default function SearchBar() {
+export default function SearchBar({
+  onSearch,
+}: {
+  onSearch: (query: string) => void;
+}) {
   return (
     <form
       className="flex items-center space-x-2 w-full shadow-xl rounded-full mt-2"
       onSubmit={(e) => {
         e.preventDefault();
-        console.log(
-          "TODO: Call to Search API:",
-          (document.getElementById("project-search")! as HTMLInputElement).value
-        );
+        const query = (e.target as HTMLFormElement).elements.namedItem(
+          "project-search"
+        ) as HTMLInputElement;
+        onSearch(query.value);
       }}
     >
       <div className="w-3"></div>

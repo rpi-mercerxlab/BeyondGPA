@@ -10,12 +10,16 @@ import { redirect } from "next/navigation";
 export const searchProjects = async (
   keywords: string[],
   skills: string[],
-  groups: string[]
+  groups: string[],
+  paginationToken?: string
 ) => {
   const queryParams = new URLSearchParams();
   keywords.forEach((keyword) => queryParams.append("keywords", keyword));
   skills.forEach((skill) => queryParams.append("skills", skill));
   groups.forEach((group) => queryParams.append("groups", group));
+  if (paginationToken) {
+    queryParams.append("token", paginationToken);
+  }
 
   const response = await fetch(`/api/v1/project?${queryParams.toString()}`);
   if (!response.ok) {
