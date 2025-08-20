@@ -144,6 +144,11 @@ export default function AdvancedSearch({
           Error Creating Project: {projectCreateError}
         </div>
       )}
+      {error && (
+        <div className="text-red-500 text-sm my-0.5">
+          Error Loading Data: {error}
+        </div>
+      )}
       {loaded && (
         <div
           className={`bg-bg-base-100 overflow-y-auto transition-all duration-300 rounded-md shadow-lg ${
@@ -203,7 +208,6 @@ export default function AdvancedSearch({
             >
               Search
             </BeyondButton>
-        
           </div>
         </div>
       )}

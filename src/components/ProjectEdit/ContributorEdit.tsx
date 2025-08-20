@@ -105,7 +105,7 @@ export default function ContributorProjectEdit({
                     alt: resp.image!.altText,
                     id: resp.image!.id,
                   },
-                  storageRemaining: resp.image?.storageRemaining!,
+                  storageRemaining: resp.image!.storageRemaining!,
                 }));
               }
               return { ...resp, url: resp.image?.url };

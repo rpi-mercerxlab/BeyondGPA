@@ -6,6 +6,8 @@ import { authOptions } from "@/lib/authentication/auth";
 import { prisma } from "@/lib/prisma";
 import { ArrowLeft } from "lucide-react";
 import { getServerSession } from "next-auth";
+import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 export default async function ProjectView({
@@ -81,9 +83,9 @@ export default async function ProjectView({
       <Header />
       <div className="flex flex-col w-2/3 grow shrink basis-auto mt-2">
         <div className="flex w-full items-center justify-between">
-          <a href="/" className="flex items-center gap-2 text-primary">
+          <Link href="/" className="flex items-center gap-2 text-primary">
             <ArrowLeft size={32} /> Back to Project Search
-          </a>
+          </Link>
 
           {canEdit && (
             <BeyondButtonLink
@@ -100,14 +102,13 @@ export default async function ProjectView({
             <p
               dangerouslySetInnerHTML={{ __html: projectData.description }}
             ></p>
-            {projectData.questionPrompts.length > 0 && (
+            {projectData.questionPrompts.length > 0 &&
               projectData.questionPrompts.map((q) => (
                 <div key={q.id} className="mt-4">
                   <h2 className="text-2xl text-primary">{q.question}</h2>
                   <p dangerouslySetInnerHTML={{ __html: q.answer }} />
                 </div>
-              ))
-            )}
+              ))}
           </div>
           <div className="w-1/3 flex flex-col rounded-md shadow-md p-2 mb-2">
             <p className="text-gray-500">
@@ -158,7 +159,7 @@ export default async function ProjectView({
             {projectData.thumbnail && (
               <>
                 <h2 className="text-2xl text-primary mt-2">Thumbnail</h2>
-                <img
+                <Image
                   src={projectData.thumbnail.url}
                   alt={projectData.thumbnail.altText}
                   className="w-full h-auto rounded-md"
@@ -171,7 +172,7 @@ export default async function ProjectView({
                 <div className="flex flex-col space-y-2">
                   {projectData.images.map((image) => (
                     <div key={image.id} className="flex flex-col items-center">
-                      <img
+                      <Image
                         src={image.url}
                         alt={image.altText}
                         className="w-full h-auto rounded-md "

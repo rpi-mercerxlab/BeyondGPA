@@ -29,7 +29,7 @@ if (!isProduction) {
 export const authOptions: NextAuthOptions = {
   providers,
   secret: process.env.NEXTAUTH_SECRET,
-  // @ts-ignore
+  // @ts-expect-error NextAuthOptions is not typed correctly since we are changing the default user type.
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "database",

@@ -1,6 +1,7 @@
 "use client";
 
 import { StudentProjectPreview } from "@/types/student_project";
+import Image from "next/image";
 import { useRef, useEffect } from "react";
 
 export default function ProjectsList({
@@ -12,6 +13,7 @@ export default function ProjectsList({
 }) {
   const loaderRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
+    const ref = loaderRef.current;
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
@@ -22,16 +24,16 @@ export default function ProjectsList({
       { root: null, rootMargin: "200px", threshold: 0 }
     );
 
-    if (loaderRef.current) {
-      observer.observe(loaderRef.current);
+    if (ref) {
+      observer.observe(ref);
     }
 
     return () => {
-      if (loaderRef.current) {
-        observer.unobserve(loaderRef.current);
+      if (ref) {
+        observer.unobserve(ref);
       }
     };
-  }, []);
+  }, [loadMore]);
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
@@ -43,7 +45,7 @@ export default function ProjectsList({
           title={`Click here to learn more about ${project.title}.`}
         >
           {project.thumbnail && (
-            <img
+            <Image
               src={project.thumbnail.url}
               alt={project.thumbnail.alt}
               className="w-full h-auto max-h-48 rounded-t-lg object-contain"

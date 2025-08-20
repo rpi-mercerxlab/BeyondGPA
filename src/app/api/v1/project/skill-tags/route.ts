@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
 
-export async function GET(_: Request) {
+export async function GET() {
   try {
     const skillTags = await prisma.skillTag.findMany({
       orderBy: { name: "asc" },

@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Footer from "@/components/common/footer";
-import Header from "@/components/common/header/header";
 
 export const metadata: Metadata = {
   title: "BeyondGPA",

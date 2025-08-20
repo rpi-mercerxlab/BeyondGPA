@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import BeyondLineEdit from "./BeyondComponents/BeyondLineEdit";
+import Image from "next/image";
 
 interface ImageUploadProps {
   existingImage?: string; // URL of an existing image
@@ -25,7 +26,6 @@ export default function SingleImageUpload({
   const [preview, setPreview] = useState<string | null>(existingImage || null);
   const [altText, setAltText] = useState<string>(existingAlt);
   const [error, setError] = useState<string | null>(null);
-
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -84,7 +84,7 @@ export default function SingleImageUpload({
         {preview ? (
           <div className="flex flex-col items-center space-y-2 w-full">
             <div className="relative">
-              <img
+              <Image
                 src={preview}
                 alt={altText || "Uploaded preview"}
                 className=" h-fit rounded-lg"

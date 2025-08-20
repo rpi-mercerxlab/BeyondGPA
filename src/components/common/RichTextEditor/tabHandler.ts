@@ -7,7 +7,7 @@ const TabHandler = Extension.create({
     return {
       Tab: () => {
         const { editor } = this;
-        const { state, view } = editor;
+        const { state } = editor;
         const { from, to } = state.selection;
 
         // Insert 2 spaces at cursor

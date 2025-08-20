@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function ProjectResearchSelector() {
@@ -7,15 +8,15 @@ export function ProjectResearchSelector() {
 
   return (
     <div className="flex items-center border-2 border-primary w-full rounded-lg text-lg h-8">
-      <a
+      <Link
         href="/"
         className={`w-1/2 h-full text-center ${
           pathname === "/" ? "bg-primary text-white" : "text-primary"
         }`}
       >
         Student Projects
-      </a>
-      <a
+      </Link>
+      <Link
         href="/research-opportunities"
         className={`w-1/2 h-full text-center ${
           pathname === "/research-opportunities"
@@ -24,7 +25,7 @@ export function ProjectResearchSelector() {
         }`}
       >
         Research Opportunities
-      </a>
+      </Link>
     </div>
   );
 }

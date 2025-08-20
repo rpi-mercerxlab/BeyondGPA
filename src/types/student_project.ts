@@ -8,8 +8,8 @@ export type StudentProject = {
   };
   contributors: Contributor[];
   skillTags: SkillTag[];
-  images: Image[];
-  thumbnail: Image | undefined | null;
+  images: ImageStruct[];
+  thumbnail: ImageStruct | undefined | null;
   links: Link[];
   description: string;
   questions: QuestionPrompt[];
@@ -23,13 +23,13 @@ export type StudentProjectPreview = {
   project_id: string;
   title: string;
   description: string;
-  thumbnail: Image | undefined | null;
+  thumbnail: ImageStruct | undefined | null;
   contributors: string[];
   skillTags: string[];
   group: string | undefined | null;
 };
 
-export type Image = {
+export type ImageStruct = {
   id: string;
   url: string;
   alt: string;

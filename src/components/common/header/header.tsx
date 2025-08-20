@@ -1,5 +1,6 @@
 import Image from "next/image";
 import HeaderLoginButton from "./user_info";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -11,11 +12,11 @@ export default function Header() {
         height={25}
         className="inline-block mr-2"
       />
-      <a href="/" className="text-lg sm:text-xl md:text-2xl font-sans">
+      <Link href="/" className="text-lg sm:text-xl md:text-2xl font-sans">
         <span className="font-bold">Mercer XLab</span>
         <span className="p-2">-</span>
         <span className="font-light italic">BeyondGPA</span>
-      </a>
+      </Link>
       <div className="flex grow shrink basis-auto"></div>
       <HeaderLoginButton />
     </header>

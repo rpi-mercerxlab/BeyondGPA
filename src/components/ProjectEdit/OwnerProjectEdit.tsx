@@ -7,7 +7,7 @@ import {
   SkillTag,
   StudentProject,
 } from "@/types/student_project";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import OwnersToolbox from "./OwnersToolbox";
 import {
   addContributor,
@@ -108,6 +108,11 @@ export default function OwnerProjectEdit({
               Last Updated: {new Date(project.updatedAt).toLocaleDateString()}
             </p>
           </div>
+          {error && (
+            <div className="text-red-500 text-sm my-0.5">
+              Error Changing Title: {error}
+            </div>
+          )}
           <BeyondLineEdit
             className="text-3xl! font-bold text-primary w-full"
             placeholder="Enter project title"
@@ -210,7 +215,7 @@ export default function OwnerProjectEdit({
                     alt: resp.image!.altText,
                     id: resp.image!.id,
                   },
-                  storageRemaining: resp.image?.storageRemaining!,
+                  storageRemaining: resp.image!.storageRemaining!,
                 }));
               }
               return { ...resp, url: resp.image?.url };

@@ -28,7 +28,7 @@ export default function CourseGroupSelector({
     return availableGroups.filter((group) =>
       group.toLowerCase().includes(lowerQuery)
     );
-  }, [debouncedQuery, availableGroups, selectedGroups]);
+  }, [debouncedQuery, availableGroups]);
 
   const hasNoMatches = debouncedQuery && filteredGroups.length === 0;
 
@@ -44,8 +44,6 @@ export default function CourseGroupSelector({
   const handleRemove = useCallback(
     (group: string) => {
       onCourseDeselect(group);
-
-      [onCourseDeselect];
     },
     [onCourseDeselect]
   );
@@ -123,11 +121,12 @@ export default function CourseGroupSelector({
               (g) => g.toLowerCase() === debouncedQuery.toLowerCase()
             ) ? (
             <div className="px-3 py-2 text-gray-500">
-              Group "{debouncedQuery}" does not exist.
+              Group &ldquo;{debouncedQuery}&rdquo; does not exist.
             </div>
           ) : (
             <div className="px-3 py-2 text-gray-500">
-              You have already selected the group “{debouncedQuery}”.
+              You have already selected the group &ldquo;{debouncedQuery}
+              &rdquo;.
             </div>
           )}
         </div>

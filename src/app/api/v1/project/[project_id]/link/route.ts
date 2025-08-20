@@ -33,7 +33,7 @@ export async function POST(
 
     const link_id = randomUUID();
 
-    const updatedProject = await prisma.project.update({
+    await prisma.project.update({
       where: { id: project_id },
       data: {
         links: {

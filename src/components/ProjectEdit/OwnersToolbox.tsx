@@ -1,7 +1,7 @@
 "use client";
 import { Group, ProjectVisibility } from "@/types/student_project";
 import { StudentProject } from "@/types/student_project";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import BeyondButton from "../common/BeyondComponents/BeyondButton";
 import { Contributor } from "@/types/student_project";
 import BeyondLineEdit from "../common/BeyondComponents/BeyondLineEdit";

@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
-import { group } from "console";
 
 export async function GET(request: Request) {
   try {
@@ -115,7 +114,7 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(_: Request) {
+export async function POST() {
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(JSON.stringify({ project_id: undefined }), {
@@ -156,43 +155,3 @@ export async function POST(_: Request) {
   }
 }
 
-function filterQueryFactory(
-  keywords: string[],
-  skills: string[],
-  groups: string[]
-): any {
-  return {
-    AND: [
-      {
-        visibility: { equals: "PUBLIC" },
-      },
-      {
-        group: {
-          name: {
-            in: groups.length > 0 ? groups : undefined,
-            mode: "insensitive",
-          },
-        },
-      },
-      {
-        skillTags: {
-          some: {
-            name: {
-              in: skills.length > 0 ? skills : undefined,
-              mode: "insensitive",
-            },
-          },
-        },
-      },
-      {
-        OR:
-          keywords.length > 0
-            ? keywords.map((keyword) => ({
-                title: { contains: keyword, mode: "insensitive" },
-                description: { contains: keyword, mode: "insensitive" },
-              }))
-            : undefined,
-      },
-    ],
-  };
-}

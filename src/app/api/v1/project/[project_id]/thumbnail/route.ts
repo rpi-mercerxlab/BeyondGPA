@@ -123,8 +123,8 @@ export async function POST(
         undefined,
         { "Content-Type": request.headers.get("Content-Type") || "" }
       );
-    } catch (e: any) {
-      if (e.message === "Quota exceeded") {
+    } catch (e) {
+      if (e instanceof Error && e.message === "Quota exceeded") {
         // Delete any partial object if MinIO already created one
         try {
           await minioClient.removeObject(

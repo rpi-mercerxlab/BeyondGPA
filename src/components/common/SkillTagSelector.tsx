@@ -101,7 +101,7 @@ export default function TagSelector({
         setHighlightIndex(0);
       }
     }
-  }, [debouncedQuery, onCreateTag, handleSelect]);
+  }, [debouncedQuery, onCreateTag, handleSelect, allowTagCreation]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!debouncedQuery && e.key !== "Escape") return;
@@ -212,12 +212,12 @@ export default function TagSelector({
               </div>
             ) : (
               <div className="px-3 py-2 text-gray-500">
-                Tag "{debouncedQuery}" does not exist.
+                Tag &ldquo;{debouncedQuery}&rdquo; does not exist.
               </div>
             )
           ) : (
             <div className="px-3 py-2 text-gray-500">
-              You have already selected the tag “{debouncedQuery}”.
+              You have already selected the tag &ldquo;{debouncedQuery}&rdquo;.
             </div>
           )}
         </div>

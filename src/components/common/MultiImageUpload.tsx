@@ -1,6 +1,7 @@
-import { Image } from "@/types/student_project";
+import { ImageStruct } from "@/types/student_project";
 import { useState } from "react";
 import BeyondLineEdit from "./BeyondComponents/BeyondLineEdit";
+import Image from "next/image";
 
 export default function MultiImageUpload({
   images,
@@ -10,7 +11,7 @@ export default function MultiImageUpload({
   onDelete,
   onLink,
 }: {
-  images: Image[];
+  images: ImageStruct[];
   storageRemaining: number;
   onUpload: (
     file: File
@@ -39,7 +40,7 @@ export default function MultiImageUpload({
           className="flex items-start space-y-2 border-b border-primary mb-2 h-fit"
         >
           <div className="relative w-1/3">
-            <img src={image.url} alt={image.alt} className="" />
+            <Image src={image.url} alt={image.alt} className="" />
             <button
               className="absolute top-1 right-1 bg-primary text-white flex items-center justify-center w-4 h-4 rounded-full"
               onClick={async () => {
