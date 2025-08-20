@@ -1,6 +1,5 @@
 import { useState } from "react";
 import BeyondLineEdit from "./BeyondComponents/BeyondLineEdit";
-import Image from "next/image";
 
 interface ImageUploadProps {
   existingImage?: string; // URL of an existing image
@@ -84,7 +83,7 @@ export default function SingleImageUpload({
         {preview ? (
           <div className="flex flex-col items-center space-y-2 w-full">
             <div className="relative">
-              <Image
+              <img
                 src={preview}
                 alt={altText || "Uploaded preview"}
                 className=" h-fit rounded-lg"

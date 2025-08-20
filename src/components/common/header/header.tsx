@@ -1,11 +1,10 @@
-import Image from "next/image";
 import HeaderLoginButton from "./user_info";
 import Link from "next/link";
 
 export default function Header() {
   return (
     <header className="bg-primary text-white px-2 py-0.5 w-full flex items-center justify-start">
-      <Image
+      <img
         src="/Mercer-X-Logo.png"
         alt="Mercer XLab Logo"
         width={25}

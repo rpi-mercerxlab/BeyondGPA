@@ -170,7 +170,7 @@ export const updateTitle = async (project_id: string, title: string) => {
     body: JSON.stringify({ title }),
   });
 
-  return { ok: res.ok, message: await res.text() };
+  return { ok: res.ok, message: res.ok ? undefined : await res.text(), title };
 };
 
 export const createNewGroup = async (name: string) => {

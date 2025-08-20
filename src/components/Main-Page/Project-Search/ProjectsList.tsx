@@ -1,7 +1,6 @@
 "use client";
 
 import { StudentProjectPreview } from "@/types/student_project";
-import Image from "next/image";
 import { useRef, useEffect } from "react";
 
 export default function ProjectsList({
@@ -45,7 +44,7 @@ export default function ProjectsList({
           title={`Click here to learn more about ${project.title}.`}
         >
           {project.thumbnail && (
-            <Image
+            <img
               src={project.thumbnail.url}
               alt={project.thumbnail.alt}
               className="w-full h-auto max-h-48 rounded-t-lg object-contain"

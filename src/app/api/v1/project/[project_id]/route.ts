@@ -37,7 +37,6 @@ export async function GET(
       },
     });
 
-    console.log(project?.contributors);
 
     if (!project || project.visibility === "DELETED") {
       return new Response(JSON.stringify({ project: undefined }), {

@@ -36,7 +36,6 @@ export default function QuestionInput({
   );
   const [error, setError] = useState<string | undefined>("");
 
-  console.log(prompt);
 
   const handlePromptSelect = (selectedPrompt: string) => {
     if (selectedPrompt === "custom") {

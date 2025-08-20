@@ -6,7 +6,6 @@ import { authOptions } from "@/lib/authentication/auth";
 import { prisma } from "@/lib/prisma";
 import { ArrowLeft } from "lucide-react";
 import { getServerSession } from "next-auth";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -159,7 +158,7 @@ export default async function ProjectView({
             {projectData.thumbnail && (
               <>
                 <h2 className="text-2xl text-primary mt-2">Thumbnail</h2>
-                <Image
+                <img
                   src={projectData.thumbnail.url}
                   alt={projectData.thumbnail.altText}
                   className="w-full h-auto rounded-md"
@@ -172,7 +171,7 @@ export default async function ProjectView({
                 <div className="flex flex-col space-y-2">
                   {projectData.images.map((image) => (
                     <div key={image.id} className="flex flex-col items-center">
-                      <Image
+                      <img
                         src={image.url}
                         alt={image.altText}
                         className="w-full h-auto rounded-md "

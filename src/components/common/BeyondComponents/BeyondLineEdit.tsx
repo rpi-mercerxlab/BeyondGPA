@@ -21,7 +21,6 @@ export default function BeyondLineEdit({
 }) {
   const [propValue, setPropValue] = useState(value);
   const [currentValue, setCurrentValue] = useState<string>(value);
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (value !== propValue) {
@@ -29,15 +28,14 @@ export default function BeyondLineEdit({
       setCurrentValue(value);
     }
     const handler = setTimeout(() => {
-      if (loaded) {
+      if (!disabled) {
         onChange(currentValue);
       }
-      setLoaded(true);
     }, debounceDuration || 800);
     return () => {
       clearTimeout(handler);
     };
-  }, [currentValue, value, propValue, debounceDuration, onChange, loaded]);
+  }, [currentValue, value, propValue, debounceDuration, disabled]);
 
   return (
     <input

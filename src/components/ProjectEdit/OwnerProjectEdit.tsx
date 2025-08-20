@@ -126,7 +126,7 @@ export default function OwnerProjectEdit({
                   title: value,
                 }));
               }
-              setError(resp.message);
+              setError(resp.message ? resp.message : null);
             }}
           />
           <OwnersToolbox

@@ -118,6 +118,7 @@ export default function OwnersToolbox({
                   }
                   setError(null);
                 }}
+                disabled={contributor.email === project.owner.email}
               />
               <BeyondLineEdit
                 placeholder="Contributor Email"
@@ -134,6 +135,7 @@ export default function OwnersToolbox({
                   }
                   setError(null);
                 }}
+                disabled={contributor.email === project.owner.email}
               />
               <select
                 className="w-fit bg-bg-base-200 border border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
@@ -150,6 +152,7 @@ export default function OwnersToolbox({
                   }
                   setError(null);
                 }}
+                disabled={contributor.email === project.owner.email}
               >
                 <option value="VIEWER">Viewer</option>
                 <option value="EDITOR">Editor</option>

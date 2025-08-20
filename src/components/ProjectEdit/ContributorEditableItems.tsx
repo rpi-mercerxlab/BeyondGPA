@@ -77,7 +77,6 @@ export default function ContributorEditableItems({
 }) {
   const [description, setDescription] = useState(project.description);
 
-  console.log(project);
 
   return (
     <div>
