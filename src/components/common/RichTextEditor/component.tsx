@@ -39,7 +39,7 @@ export default function RichTextEditor({
       StarterKit.configure({
         paragraph: {
           HTMLAttributes: {
-            class: "text-sm ",
+            class: "",
           },
         },
         bold: {

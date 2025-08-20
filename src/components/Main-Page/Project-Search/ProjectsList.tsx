@@ -34,7 +34,7 @@ export default function ProjectsList({
   }, []);
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
+    <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
       {projects.map((project) => (
         <a
           key={project.project_id}
