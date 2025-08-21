@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   app:
     build:
@@ -40,6 +38,8 @@ services:
     volumes:
       - .:/usr/src/app
     command: npx prisma migrate deploy
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
     depends_on:
       - database
   minio:
