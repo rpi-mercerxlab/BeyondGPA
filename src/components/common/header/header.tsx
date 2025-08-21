@@ -1,0 +1,23 @@
+import HeaderLoginButton from "./user_info";
+import Link from "next/link";
+
+export default function Header() {
+  return (
+    <header className="bg-primary text-white px-2 py-0.5 w-full flex items-center justify-start">
+      <img
+        src="/Mercer-X-Logo.png"
+        alt="Mercer XLab Logo"
+        width={25}
+        height={25}
+        className="inline-block mr-2"
+      />
+      <Link href="/" className="text-lg sm:text-xl md:text-2xl font-sans">
+        <span className="font-bold">Mercer XLab</span>
+        <span className="p-2">-</span>
+        <span className="font-light italic">BeyondGPA</span>
+      </Link>
+      <div className="flex grow shrink basis-auto"></div>
+      <HeaderLoginButton />
+    </header>
+  );
+}

@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Source Sans 3", sans-serif;
-  --color-bg-base: #FFF5EB;
-  --color-primary: #D6001C;
+  --color-bg-base-100: #fff5eb;
+  --color-bg-base-200: #f2e3d3;
+  --color-primary: #d6001c;
   --breakpoint-xs: 400px;
 }

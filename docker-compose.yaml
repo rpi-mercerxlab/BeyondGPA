@@ -1,0 +1,59 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}"
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXTAUTH_ENV: ${NEXTAUTH_ENV}
+      NEXTAUTH_DEBUG: ${NEXTAUTH_DEBUG}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      RPI_SHIBBOLETH_CLIENT_ID: ${RPI_SHIBBOLETH_CLIENT_ID}
+      RPI_SHIBBOLETH_CLIENT_SECRET: ${RPI_SHIBBOLETH_CLIENT_SECRET}
+      SESSION_LIFETIME_DAYS: ${SESSION_LIFETIME_DAYS}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_USE_SSL: ${MINIO_USE_SSL}
+      STUDENT_PROJECT_BUCKET_NAME: ${STUDENT_PROJECT_BUCKET_NAME}
+    ports:
+      - "3000:3000"
+  database:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+  migrate:
+    image: node:22-slim
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+    command: npx prisma migrate deploy
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+    depends_on:
+      - database
+  minio:
+    image: quay.io/minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+
+volumes:
+  postgres_data:
+  minio_data:
