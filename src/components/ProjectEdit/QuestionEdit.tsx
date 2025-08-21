@@ -36,14 +36,17 @@ export default function QuestionInput({
   );
   const [error, setError] = useState<string | undefined>("");
 
-
-  const handlePromptSelect = (selectedPrompt: string) => {
+  const handlePromptSelect = async (selectedPrompt: string) => {
     if (selectedPrompt === "custom") {
       setCustomPrompt(true);
       setLocalPrompt("");
     } else {
       setLocalPrompt(selectedPrompt);
       setCustomPrompt(false);
+      const resp = await onPromptChange(selectedPrompt);
+      if (!resp.ok) {
+        setError(resp.message || "Failed to save prompt");
+      }
     }
   };
 

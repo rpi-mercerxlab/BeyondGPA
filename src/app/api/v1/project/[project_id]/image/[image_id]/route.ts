@@ -9,9 +9,6 @@ export async function GET(
 ) {
   const { project_id, image_id } = await params;
   const session = await getServerSession(authOptions);
-  if (!session) {
-    return new Response("Unauthorized", { status: 401 });
-  }
 
   try {
     const project = await prisma.project.findUnique({
@@ -34,7 +31,8 @@ export async function GET(
 
     if (
       project.visibility === "DRAFT" &&
-      !project.contributors.some((c) => c.email === session.user.email)
+      (!session ||
+        !project.contributors.some((c) => c.email === session.user.email))
     ) {
       return new Response("Forbidden", { status: 403 });
     }
