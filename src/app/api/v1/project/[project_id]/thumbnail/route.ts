@@ -214,7 +214,7 @@ export async function PUT(
     }
 
     const reqJSON = await request.json();
-    if (!reqJSON.alt) {
+    if (reqJSON.alt === undefined) {
       return new Response("Alt text is required", { status: 400 });
     }
 

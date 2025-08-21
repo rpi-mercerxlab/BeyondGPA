@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Source_Sans_3 } from "next/font/google";
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-sans", // if you want to use in Tailwind
+});
 
 export const metadata: Metadata = {
   title: "BeyondGPA",
@@ -15,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={` antialiased bg-bg-base-100 flex flex-col items-start justify-start min-h-screen text-text-base`}
+        className={` antialiased bg-bg-base-100 flex flex-col items-start justify-start min-h-screen text-text-base ${sourceSans.variable}`}
       >
         {children}
       </body>
