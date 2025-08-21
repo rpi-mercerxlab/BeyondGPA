@@ -1,5 +1,5 @@
 import { User } from "next-auth";
-import { prisma } from "@/prisma";
+import { prisma } from "@/lib/prisma";
 import { randomUUID } from "crypto";
 
 export async function POST(request: Request) {
@@ -15,7 +15,6 @@ export async function POST(request: Request) {
   const user: User = await request.json();
   const email = user.email;
 
-  console.log(user);
 
   const resp = await prisma.user.upsert({
     where: { email },
@@ -26,6 +25,7 @@ export async function POST(request: Request) {
       rcsid: user.rcsid || "",
       role: user.role || "student",
       emailVerified: null, // Set to null for mock users
+      id: randomUUID(),
     },
     update: {},
   });
@@ -38,11 +38,11 @@ export async function POST(request: Request) {
       userId: resp.id,
       expires: new Date(
         Date.now() +
-          parseInt(process.env.SESSION_LIFETIME_DAYS || "30") *
-            24 *
-            60 *
-            60 *
-            1000 // Convert days to milliseconds
+        parseInt(process.env.SESSION_LIFETIME_DAYS || "30") *
+        24 *
+        60 *
+        60 *
+        1000 // Convert days to milliseconds
       ).toISOString(),
     },
   });

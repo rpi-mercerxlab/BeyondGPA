@@ -2,7 +2,7 @@
 
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
-import BeyondButton from "../common/BeyondButton";
+import BeyondButton from "../BeyondComponents/BeyondButton";
 
 export default function LogOutButton({ session }: { session: Session }) {
   const greeting =
@@ -21,7 +21,6 @@ export default function LogOutButton({ session }: { session: Session }) {
       <BeyondButton
         className="w-fit"
         onClick={() => {
-          console.log("signing_out");
           signOut({ callbackUrl: "/" });
         }}
       >

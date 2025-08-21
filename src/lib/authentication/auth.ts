@@ -1,11 +1,11 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import { Provider } from "next-auth/providers/index";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/prisma";
+import { prisma } from "@/lib/prisma";
 import {
   RPI_SHIBBOLETH_PROVIDER,
   DEVELOPMENT_PROVIDER,
-} from "@/authentication/providers";
+} from "@/lib/authentication/providers";
 
 const isProduction = process.env.NEXTAUTH_ENV === "production";
 
@@ -29,7 +29,7 @@ if (!isProduction) {
 export const authOptions: NextAuthOptions = {
   providers,
   secret: process.env.NEXTAUTH_SECRET,
-  // @ts-ignore
+  // @ts-expect-error NextAuthOptions is not typed correctly since we are changing the default user type.
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "database",
@@ -65,8 +65,6 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, user }) {
-      console.log("Session callback triggered", { session, user });
-
       session.user = user;
       return session;
     },
