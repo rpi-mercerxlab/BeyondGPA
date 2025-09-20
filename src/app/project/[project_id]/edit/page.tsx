@@ -106,7 +106,7 @@ export default async function ProjectEdit({
   return (
     <div className="w-full h-full flex flex-col items-center justify-start min-h-screen">
       <Header />
-      <div className="flex flex-col items-center justify-start w-2/3 grow shrink basis-auto">
+      <div className="flex flex-col items-center justify-start w-full sm:w-11/12 md:w-5/6 lg:w-2/3 grow shrink basis-auto">
         {isOwner && <OwnerProjectEdit project={project} />}
         {!isOwner && canEdit && <ContributorProjectEdit project={project} />}
         {!isOwner && !canEdit && (

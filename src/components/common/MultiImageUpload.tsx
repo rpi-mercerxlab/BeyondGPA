@@ -83,6 +83,7 @@ export default function MultiImageUpload({
                 if (!result.ok) {
                   setError(result.message || "Upload failed");
                 }
+                setError(null);
               }
             }}
           />
@@ -97,6 +98,7 @@ export default function MultiImageUpload({
               if (!result.ok) {
                 setError(result.message || "Linking image failed");
               }
+              setError(null);
             }
           }}
           value=""

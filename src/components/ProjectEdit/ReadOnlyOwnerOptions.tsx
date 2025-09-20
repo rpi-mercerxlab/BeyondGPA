@@ -7,9 +7,11 @@ export default function ReadOnlyOwnerOptions({
 }) {
   return (
     <div className="flex flex-col items-start justify-start w-full shadow p-2 rounded-md">
-      <h1 className="text-xl font-bold text-primary pl-2">Project Owner Settings</h1>
+      <h1 className="text-xl font-bold text-primary pl-2">
+        Project Owner Settings
+      </h1>
       <p className="pl-2">
-        Only the project owner, {project.owner.name}, can change these settings.{" "}
+        Only the project owner, <span className="font-bold text-primary">{project.owner.name}</span>, can change these settings.{" "}
       </p>
       <div className="flex flex-col items-start justify-between w-full p-2">
         <div className="w-full flex items-center justify-between pb-2 border-b border-gray-300">
@@ -31,7 +33,9 @@ export default function ReadOnlyOwnerOptions({
         </div>
         <div className="w-full flex items-center justify-between py-2 border-b border-gray-300 space-y-2">
           <p className="mb-0">Project Group</p>
-          <p>{project.group.name}</p>
+          <p>
+            {project.group.name.length > 0 ? project.group.name : "No Group"}
+          </p>
         </div>
       </div>
     </div>

@@ -35,11 +35,11 @@ export default function ProjectsList({
   }, [loadMore]);
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 mt-2">
+    <div className="flex flex-wrap items-center justify-center space-y-2 space-x-2 mt-2">
       {projects.map((project) => (
         <a
           key={project.project_id}
-          className="bg-bg-base-100 rounded-lg shadow-lg w-96 h-[400px]"
+          className="bg-bg-base-100 rounded-lg shadow-lg max-w-sm w-full xs:h-[400px]"
           href={`/project/${project.project_id}`}
           title={`Click here to learn more about ${project.title}.`}
         >
@@ -50,23 +50,25 @@ export default function ProjectsList({
               className="w-full h-auto max-h-48 rounded-t-lg object-contain"
             />
           )}
-          <div className="p-2">
+          <div className="p-2 w-full">
             <h2 className="text-2xl text-primary text-center line-clamp-2">
               {project.title}
             </h2>
-            <div className="w-full flex items-center">
-              <h3 className="text-sm font-semibold text-primary mr-1">
+            <div className="max-w-full flex items-center truncate">
+              <h3 className="text-sm font-semibold text-primary mr-1 ">
                 Contributors:
               </h3>
-              <p className="truncate text-sm">
+              <p className=" truncate text-sm min-w-0">
                 {project.contributors.join(", ")}
               </p>
             </div>
-            <div className="flex items-center border-b border-primary">
+            <div className="flex items-center border-b border-primary truncate">
               <h3 className="text-sm font-semibold text-primary mr-1">
                 Skills:
               </h3>
-              <p className="truncate text-sm">{project.skillTags.join(", ")}</p>
+              <p className="truncate text-sm min-w-0">
+                {project.skillTags.join(", ")}
+              </p>
             </div>
             <p
               className="line-clamp-4"

@@ -61,10 +61,10 @@ export default function QuestionInput({
         </div>
       )}
       <div className="flex flex-col w-full">
-        <div className="flex w-full justify-between mb-0.5">
+        <div className="flex w-full justify-between mb-2 space-x-2 items-center">
           <select
             onChange={(e) => handlePromptSelect(e.target.value)}
-            className="border border-gray-300 rounded-md p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary"
             value={
               customPrompt
                 ? "custom"
@@ -84,7 +84,7 @@ export default function QuestionInput({
             <option value="custom">Write your own prompt!</option>
           </select>
           <BeyondButton
-            className="h-8 flex items-center"
+            className="w-fit text-nowrap text-base h-8 flex items-center"
             onClick={() => {
               if (confirm("Are you sure you want to delete this question?"))
                 onDelete();

@@ -80,8 +80,8 @@ export default async function ProjectView({
   return (
     <div className="flex flex-col w-full items-center min-h-screen justify-start">
       <Header />
-      <div className="flex flex-col w-2/3 grow shrink basis-auto mt-2">
-        <div className="flex w-full items-center justify-between">
+      <div className="flex flex-col w-11/12 md:w-2/3 grow shrink basis-auto mt-2">
+        <div className="flex w-full  sm:flex-row items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-primary">
             <ArrowLeft size={32} /> Back to Project Search
           </Link>
@@ -95,9 +95,11 @@ export default async function ProjectView({
             </BeyondButtonLink>
           )}
         </div>
-        <div className="flex space-x-2">
-          <div className="w-2/3">
-            <h1 className="text-[20pt] text-primary">{projectData.title}</h1>
+        <h1 className="text-[20pt] text-primary text-center xs:text-start">
+          {projectData.title}
+        </h1>
+        <div className="flex flex-col-reverse sm:flex-row space-x-2">
+          <div className="w-full sm:w-2/3">
             <p
               dangerouslySetInnerHTML={{ __html: projectData.description }}
             ></p>
@@ -109,7 +111,7 @@ export default async function ProjectView({
                 </div>
               ))}
           </div>
-          <div className="w-1/3 flex flex-col rounded-md shadow-md p-2 mb-2">
+          <div className="w-full sm:w-1/3 flex flex-col rounded-md shadow-md p-2 mb-2">
             <p className="text-gray-500">
               Created On: {projectData.createdAt.toLocaleDateString()}
             </p>
@@ -161,7 +163,7 @@ export default async function ProjectView({
                 <img
                   src={projectData.thumbnail.url}
                   alt={projectData.thumbnail.altText}
-                  className="w-full h-auto rounded-md"
+                  className=" h-auto rounded-md max-h-64 object-contain"
                 />
               </>
             )}
