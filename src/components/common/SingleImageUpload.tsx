@@ -86,7 +86,7 @@ export default function SingleImageUpload({
               <img
                 src={preview}
                 alt={altText || "Uploaded preview"}
-                className=" h-fit rounded-lg"
+                className="rounded-lg object-contain"
               />
               <button
                 type="button"

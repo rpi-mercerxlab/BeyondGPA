@@ -80,8 +80,8 @@ export default function ContributorEditableItems({
 
   return (
     <div>
-      <div className="flex w-full space-x-4">
-        <div className="w-1/2">
+      <div className="flex flex-col sm:flex-row w-full space-x-4">
+        <div className="w-full sm:w-1/2">
           <h1 className="text-xl font-bold text-primary w-full border-b border-primary">
             Project Thumbnail: What makes your project stand out?
           </h1>
@@ -95,7 +95,7 @@ export default function ContributorEditableItems({
             storageRemaining={project.storageRemaining}
           />
         </div>
-        <div className="w-1/2">
+        <div className="w-full sm:w-1/2">
           <h1 className="text-xl font-bold text-primary w-full border-b border-primary">
             A picture is worth a thousand words, add them here.
           </h1>
@@ -109,8 +109,8 @@ export default function ContributorEditableItems({
           />
         </div>
       </div>
-      <div className="flex w-full space-x-4 my-4">
-        <div className="w-1/2">
+      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 w-full space-x-4 my-4">
+        <div className="w-full sm:w-1/2">
           <h1 className="text-xl font-bold text-primary w-full border-b border-primary mb-1">
             Are there any relevant links to include?
           </h1>
@@ -145,7 +145,7 @@ export default function ContributorEditableItems({
             Add Link
           </BeyondButton>
         </div>
-        <div className="w-1/2">
+        <div className="w-full sm:w-1/2">
           <h1 className="text-xl font-bold text-primary w-full border-b border-primary">
             What skills did you use in this project?
           </h1>
@@ -167,7 +167,7 @@ export default function ContributorEditableItems({
         content={description}
         onBlur={() => onDescriptionChange(description)}
       />
-      <h1 className="text-xl font-bold text-primary w-full border-b border-primary pt-4">
+      <h1 className="text-xl font-bold text-primary w-full border-b border-primary pt-4 mb-1">
         Elaborate further: What did you learn, what challenges did you face, and
         what would you do differently?
       </h1>
