@@ -95,11 +95,11 @@ export default function OwnersToolbox({
             <option value="PUBLIC">Public</option>
           </select>
         </div>
-        <div className="w-full flex flex-col items-start space-y-2 border-b border-gray-300 py-2">
+        <div className="w-full flex flex-col items-start space-y-1 border-b border-gray-300 py-2">
           <p>Contributors</p>
           {project.contributors.map((contributor) => (
             <div
-              className="w-full flex items-center justify-between"
+              className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 border-b border-primary pb-1"
               key={contributor.id}
             >
               <BeyondLineEdit
@@ -159,7 +159,7 @@ export default function OwnersToolbox({
               </select>
               {contributor.email !== project.owner.email ? (
                 <BeyondButton
-                  className="text-base h-8 flex items-center"
+                  className="text-sm md:text-base h-8 flex items-center"
                   onClick={async () => {
                     const result = await onRemoveContributor(contributor.id);
                     if (!result.ok) {
@@ -174,7 +174,7 @@ export default function OwnersToolbox({
                   Remove Contributor
                 </BeyondButton>
               ) : (
-                <BeyondButton className="opacity-0">
+                <BeyondButton className="text-sm md:text-base hidden sm:block opacity-0">
                   Remove Contributor
                 </BeyondButton>
               )}
@@ -224,7 +224,7 @@ export default function OwnersToolbox({
             ))}
           </select>
         </div>
-        <div className="w-full flex items-center justify-between py-2 border-b border-gray-300 space-y-2">
+        <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between py-2 border-b border-gray-300 space-y-2">
           <p className="mb-0">Set Project Group</p>
           <select
             className="w-fit bg-bg-base-200 border mb-0 border-gray-300 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-primary text-sm"
@@ -252,7 +252,7 @@ export default function OwnersToolbox({
               debounceDuration={20}
             />
             <BeyondButton
-              className="text-base h-8 flex items-center"
+              className="text-xs xs:text-base h-8 flex items-center"
               onClick={async () => {
                 if (newGroupName.trim() === "") return;
                 const resp = await onCreateGroup(newGroupName);

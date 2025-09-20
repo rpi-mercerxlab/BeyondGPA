@@ -7,10 +7,10 @@ export function ProjectResearchSelector() {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center border-2 border-primary w-full rounded-lg text-lg h-8">
+    <div className="flex flex-col sm:flex-row items-center border-2 border-primary w-full rounded-lg text-lg h-16 sm:h-8">
       <Link
         href="/"
-        className={`w-1/2 h-full text-center ${
+        className={`w-full sm:w-1/2 h-full text-center ${
           pathname === "/" ? "bg-primary text-white" : "text-primary"
         }`}
       >
@@ -18,7 +18,7 @@ export function ProjectResearchSelector() {
       </Link>
       <Link
         href="/research-opportunities"
-        className={`w-1/2 h-full text-center ${
+        className={`w-full sm:w-1/2 h-full text-center ${
           pathname === "/research-opportunities"
             ? "bg-primary text-white"
             : "text-primary"
