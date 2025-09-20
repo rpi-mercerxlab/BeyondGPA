@@ -12,8 +12,8 @@ export default function AboveTheFold() {
       }}
     >
       <div className="bg-black/50 p-6 h-full w-full flex items-center justify-center">
-        <h1 className="text-white text-6xl font-bold">
-          Find Your Next:{" "}
+        <h1 className="text-white text-5xl sm:text-6xl font-bold text-center">
+          Find Your Next: <br />
           <ReactTyped
             className="italic font-normal"
             strings={["Researcher", "Developer", "Scientist", "Engineer"]}

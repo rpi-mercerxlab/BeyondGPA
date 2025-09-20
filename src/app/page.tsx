@@ -10,7 +10,7 @@ export default function Home() {
       <Header />
       <main className="flex flex-col items-center justify-start w-full grow shrink basis-auto">
         <AboveTheFold />
-        <div className="flex flex-col w-2/3 m-2">
+        <div className="flex flex-col w-11/12 mx-2 sm:mx-0 sm:w-2/3 m-2">
           <ProjectResearchSelector />
           <ProjectSearch />
         </div>
