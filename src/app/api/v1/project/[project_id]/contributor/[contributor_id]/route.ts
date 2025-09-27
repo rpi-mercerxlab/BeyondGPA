@@ -11,7 +11,7 @@ export async function PUT(
   const { project_id, contributor_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response(undefined, { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const json = await request.json();
@@ -34,7 +34,7 @@ export async function PUT(
     }
 
     if (project.owner.id !== session.user.id) {
-      return new Response(undefined, { status: 403 });
+      return new Response("Forbidden", { status: 403 });
     }
 
     const contributor = await prisma.contributor.findUnique({
@@ -91,7 +91,7 @@ export async function DELETE(
   const { project_id, contributor_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response(undefined, { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
   try {
@@ -105,7 +105,7 @@ export async function DELETE(
     }
 
     if (project.owner.id !== session.user.id) {
-      return new Response(undefined, { status: 403 });
+      return new Response("Forbidden", { status: 403 });
     }
 
     const contributor = await prisma.contributor.findUnique({

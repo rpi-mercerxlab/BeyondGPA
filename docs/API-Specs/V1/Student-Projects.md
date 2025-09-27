@@ -49,11 +49,11 @@ None
 
 Query Params:
 
-- `limit`: The number of projects to list, optional, default is 24.
+- `limit`: The number of projects to list, optional, default is 24. The maximum is 100.
 - `token`: The pagination token for listing the next set of results.
-- `keywords`: A list of strings that the description and title should contain. All returned projects will contain at least one keyword from this list. Default is the empty list.
-- `skills`: A list of skills that were used on the project. All returned projects will have at least one of the skills listed.
-- `groups`: Lists projects that are apart of the specified groups / courses.
+- `keywords`: A list of strings that the description and title should contain. All returned projects will contain at least one keyword from this list. Default is the empty list. The maximum length for this list is 10 items.
+- `skills`: A list of skills that were used on the project. All returned projects will have at least one of the skills listed. Default is the empty list. The maximum length for this list is 10 items.
+- `groups`: Lists projects that are apart of the specified groups / courses. Default is the empty list. The maximum length for this list is 10 items.
 
 Body:
 None
@@ -76,9 +76,9 @@ Body:
         skillTags: string[],
         group: string | undefined,
         thumbnail: {
-            link: string | undefined,
-            caption: string | undefined
-        }
+            link: string,
+            caption: string
+        } | null
     }[];
     paginationToken?: string; // This will be the id of the item to start at.
 } | string
@@ -88,7 +88,7 @@ Status:
 
 - 200: Search Successful
   - The list will have at least one item. If there are more items than the limit, a pagination token will be provided, otherwise it will be undefined.
-- 400: If there are too many keywords, majors, skill tags etc. (> 10 items in each category)
+- 400: If there are too many keywords, majors, skill tags etc. (> 10 items in each category) or if the user specifies an invalid limit parameter
   - List will be empty and token will be undefined.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
@@ -132,7 +132,6 @@ Status
   - project_id will be the UUID for the project
 - 401: Unauthorized
   - Returned if the Authorization header is blank or undefined. (The user is not logged in)
-  - Could also be returned if the auth header is invalid, like the user tried to mess with their token.
   - project_id will be undefined
 - 403: Forbidden
   - Returned if the user trying to create the project is not a student.
@@ -145,7 +144,9 @@ Status
 ### Full Project Read: `GET` `/api/v1/project/[project_id]`
 
 Returns the all the information for a project. All users are allowed to call to this endpoint.
-If this project is marked as draft, then this will return 404 for all users except the owner and collaborator.
+If this project is marked as draft, then this will return 403 for all users except the owner and collaborators.
+If this project is marked as DELETED, then this will return 404 for all
+users including the owner and collaborators.
 
 #### Request
 
@@ -182,7 +183,7 @@ Body:
         id: string
     }[],
     skill_tags: {
-        tag: string,
+        name: string,
         id: string,
     }[],
     images: {
@@ -192,7 +193,8 @@ Body:
     }[],
     thumbnail: {
         link: string | undefined,
-        caption: string | undefined
+        caption: string | undefined,
+        id: string | undefined
     },
     links: {
         link: string,
@@ -202,15 +204,16 @@ Body:
     description: string,
     questions: {
         id: string,
-        questionText: string,
-        answerText: string,
+        question: string,
+        answer: string,
     }[],
     group: {
-        id: string | undefined,
-        name: string | undefined,
+        id: string,
+        name: string,
     }
-    createdAt: string,
-    updatedAt: string,
+    createdAt: string, // The creation date formatted in the ISO standard
+    updatedAt: string, // The last updated date formatted in the ISO standard
+    storageRemaining: number
   }
 }
 ```
@@ -219,12 +222,11 @@ Status:
 
 - 200: Project Fetched Successfully
   - project will be fully populated
-- 404: The requested project was not found
+- 404: The requested project was not found or the project was deleted
 - 403: The user does not have permission to access this project
   - This will be returned if the project is marked as draft and the user is not the owner or a contributor.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - project will be undefined
 
 ### Project Delete: `DELETE` `/api/v1/project/[project_id]`
 
@@ -261,7 +263,7 @@ Status:
 
 ### Transfer Project Ownership `POST` `/api/v1/project/[project_id]/owner`
 
-Transfers ownership of the project to the user specified. Can only be called by the owner of the project.
+Transfers ownership of the project to the user specified. Can only be called by the owner of the project. If the new owner is not already a contributor they will be added with the EDITOR role. If the new owner is a contributor then we make sure they have the EDITOR role. Then we assign them as the owner of the project. Lastly we return the updated contributors list and owner info.
 
 #### Request
 
@@ -305,18 +307,18 @@ Status:
 - 200: Owner was updated successfully.
   - name and email fields will reflect the name and email of the new owner
 - 401: The user's session token is not provided or invalid
-  - body will be undefined
-- 403: The user is not the project owner.
-  - body will be undefined
+  - Body will be an error message
+- 403: The caller is not the project owner.
+  - Body will be an error message
 - 404: The email of the new owner is not registered to a known user. Or the project was not found.
   - body will say either "New Owner Not Found" or "Project Not Found"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - body will be undefined
+  - Body will be an error message
 
 ### Set Project Visibility `PUT` `/api/v1/project/[project_id]/visibility`
 
-Sets the project visibility. Only the owner of the project can call to this endpoint.
+Sets the project visibility. Only the owner of the project can call to this endpoint. This endpoint will likely change soon as we add moderation capabilities to the project.
 
 #### Request
 
@@ -344,8 +346,8 @@ Body:
 
 ```typescript
 {
-    visibility?: "PUBLIC" | "DRAFT"
-}
+    visibility: "PUBLIC" | "DRAFT"
+} | string
 ```
 
 Status:
@@ -353,14 +355,17 @@ Status:
 - 200: Visibility Set Successfully
   - `visibility` will be set to the updated visibility value
 - 400: If the specified visibility is not one of `PUBLIC` or `DRAFT`
-  - `visibility` will be undefined
+  - Body will contain error message
 - 401: The user's session token is not provided or invalid
-  - `visibility` will be undefined
+  - Body will contain error message
 - 403: The user is not the project owner.
-  - `visibility` will be undefined
+  - Body will contain error message
+- 404: The project requested was not found.
+  - Body will contain error message
 - 429: Rate Limit Exceeded.
+  - Body will contain error message
 - 500: Internal Server Error
-  - `visibility` will be undefined
+  - Body will contain error message
 
 ### Set Project Title `PUT` `/api/v1/project/[project_id]/title`
 
@@ -400,7 +405,7 @@ Status:
 
 - 200: Title Updated Successfully
   - title value will reflect the new title
-- 400: If the title is an empty string or longer than 100 characters
+- 400: If the title is longer than 100 characters
   - title value will be undefined
 - 401: The authentication token was not provided or was invalid
   - title value will be undefined
@@ -414,7 +419,7 @@ Status:
 
 ### Add Contributor `POST` `/api/v1/project/[project_id]/contributor`
 
-Adds a new contributor to the project. This can only be performed by the project owner.
+Adds a new empty contributor to the project. This can only be performed by the project owner. To assign a contributor a name and email, see the `Update Contributor` endpoint
 
 #### Request
 
@@ -452,8 +457,9 @@ Status:
 
 ### Update Contributor `PUT` `/api/v1/project/[project_id]/contributor/[contributor_id]`
 
-Updates the name and email of the specified contributor. This can only be performed by the project owner.
-The contributor corresponding to the owner of the project cannot be updated.
+Updates the name and email of the specified contributor. This can only be performed by the project owner. The contributor corresponding to the owner of the project cannot be updated. If the email for the contributor being
+updated is registered as a user, their profile will be connected to the
+project.
 
 #### Request
 
@@ -487,24 +493,24 @@ Body:
     email: string,
     role: "EDITOR" | "VIEWER"
     id: string
-} | string | undefined
+} | string
 ```
 
 Status:
 
 - 200: Title Updated Successfully
   - Name and email will be set to the new value
-- 400: If the name or email is invalid or you attempt to update the project owner
-  - Body will be undefined
+- 400: If the role specified is not either EDITOR or VIEWER, or you tried to update the info of the project owner.
+  - Body will be an error message
 - 401: The authentication token was not provided or was invalid
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not the owner of the project
-  - Body will be undefined
+  - Body will be an error message
 - 404: The requested project was not found
-  - Body will be undefined
+  - Body will be an error message
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Delete Contributor `DELETE` `/api/v1/project/[project_id]/contributor/[contributor_id]`
 
@@ -529,21 +535,33 @@ Headers
 - `Content-Type`: `application/json`
 
 Body:
-None
+
+```typescript
+string | undefined;
+```
 
 Status:
 
 - 204: Contributor was removed successfully
+  - Body is undefined
 - 400: If you try to remove the owner of the project
+  - Body is an error message
 - 401: The authentication token was not provided or was invalid
+  - Body is an error message
 - 403: The user is not the owner of the project
+  - Body is an error message
 - 404: The requested project was not found
+  - Body is an error message
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
+  - Body is an error message
 
 ### List All Existing Skill Tags `GET` `/api/v1/project/skill-tags/`
 
-Lists all the existing skill tags. Can be called by any student.
+Lists all the existing skill tags. Can be called by any user.
+
+**TODO: This should become a search endpoint, as with too many skill tags
+this could become buggy.**
 
 #### Request
 
@@ -649,24 +667,24 @@ Headers:
 Body:
 
 ```typescript
-string | undefined;
+string;
 ```
 
 Status:
 
 - 200: Tag Added Successfully
-  - body will be undefined
+  - body will be a success message
 - 401: The authentication token was not provided or was invalid
-  - body will be undefined
+  - body will be an error message
 - 403: The user is not a contributor on the project or does not have the editor role.
-  - body will be undefined
+  - body will be an error message
 - 404: The requested project or skill tag was not found
   - message will either say "Project Not Found", or "Skill Tag Not Found"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - body will be undefined
+  - body will be an error message
 
-### Remove Skill Tag `DELETE` `/api/v1/project/[project_id]/skill-tag/[tag_id]`
+### Remove Skill Tag from Project `DELETE` `/api/v1/project/[project_id]/skill-tag/[tag_id]`
 
 Removes a reference to a skill tag to the specified post. This can only be called by collaborators on the project with the editor role.
 
@@ -689,7 +707,7 @@ Headers:
 Body:
 
 ```typescript
-{ message: string} | undefined
+string | undefined;
 ```
 
 Status:
@@ -697,18 +715,18 @@ Status:
 - 204: Tag Removed Successfully
   - Body will be undefined
 - 401: The authentication token was not provided or was invalid
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor on the project or does not have the editor role.
-  - Body will be undefined
+  - Body will be an error message
 - 404: The requested project or skill tag was not found on the project
   - message will either say "Project Not Found", or "Skill Tag Not Found On Project"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - message will be undefined
+  - message will be an error message
 
 ### Update Description `PUT` `/api/v1/project/[project_id]/description`
 
-Changes the description of the project. This can only be called by collaborators on the project with the editor role.
+Changes the description of the project. This can only be called by collaborators on the project with the editor role. All description input provided to the API is HTML sanitized, and allows only the tags provided by the rich text editor.
 
 #### Request
 
@@ -735,8 +753,8 @@ Body:
 
 ```typescript
 {
-    description?:string
-}
+    description:string
+} | string
 ```
 
 Status:
@@ -744,18 +762,20 @@ Status:
 - 200: Description Updated Successfully
   - `description` will reflect the updated description.
 - 401: The authentication token was not provided or was invalid
-  - `description` will be undefined.
+  - The body will be an error message.
 - 403: The user is not a contributor on the project or does not have the editor role.
-  - `description` will be undefined.
+  - The body will be an error message.
 - 404: The requested project could not be found
-  - `description` will be undefined.
+  - The body will be an error message.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - `description` will be undefined.
+  - The body will be an error message.
 
 ### Serve Image `GET` `/api/v1/project/[project_id]/image/[image_id]`
 
-Serves the specified image. Can be called by anyone.
+Serves the specified image. Can be called by anyone. If the image
+belongs to a draft project, only collaborators with the editor role
+will have the ability to view the specified image.
 
 #### Request
 
@@ -781,7 +801,7 @@ Headers:
   - `image/x-icon` for ICO (icon) files.
 
 Body:
-ReadableStream of Image Data or undefined.
+ReadableStream of Image Data or an error message.
 
 Status:
 
@@ -791,7 +811,7 @@ Status:
   - This will be returned if the project is marked as draft and the user is not the owner or a contributor.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Add Thumbnail `POST` `/api/v1/project/[project_id]/thumbnail`
 
@@ -817,7 +837,9 @@ Body:
 The file object of the image being uploaded. Or
 
 ```typescript
-{link: string, alt: string}
+{
+  image: string;
+}
 ```
 
 if you are adding an external image link.
@@ -835,7 +857,7 @@ Body:
   link: string;
   alt: string;
   storageRemaining: number; // In bytes
-} | undefined
+} | string
 ```
 
 Status:
@@ -845,11 +867,17 @@ Status:
 - 400: Bad Request
   - If the Content-Type of this endpoint is not one of the above this will be returned.
   - If there are too few bytes remaining in the project's storage quota to upload this image.
+  - Body is an error message
 - 401: Unauthorized, the user's session token is missing or invalid
+  - Body is an error message
 - 403: The user is not a project contributor for the requested project or does not have the editor role.
+  - Body is an error message
 - 404: The requested project does not exist
+  - Body is an error message
 - 429: Rate Limit Exceeded.
+  - Body is an error message
 - 500: Internal Server Error
+  - Body is an error message
 
 ### Update Thumbnail Alt Text `PUT` `/api/v1/project/[project_id]/thumbnail`
 
@@ -880,22 +908,25 @@ Body:
 
 ```typescript
 {
-  alt?: string;
-}
+  id: string;
+  altText?: string;
+  url: string;
+} | string
 ```
 
 Status:
 
 - 200: Alt Text Updated Successfully
-  - `alt` will reflect the updated alt text.
+  - Body fields will be populated
 - 401: The authentication token was not provided or was invalid
-  - `alt` will be undefined.
+  - Body will be an error message
 - 403: The user is not a contributor on the project or does not have the editor role.
-  - `alt` will be undefined.
+  - Body will be an error message
 - 404: The requested project or image could not be found
-  - `alt` will be undefined.
+  - Body will be an error message
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
+  - Body will be an error message
 
 ### Remove Thumbnail `DELETE` `/api/v1/project/[project_id]/thumbnail`
 
@@ -921,7 +952,7 @@ Headers:
 Body:
 
 ```typescript
-{storageRemaining: number} | string | undefined
+{storageRemaining: number} | string
 ```
 
 Status:
@@ -929,14 +960,14 @@ Status:
 - 200: Thumbnail deleted successfully
   - Body will contain the updated storage remaining amount.
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor on the requested project or does not have the editor role.
-  - Body will be undefined
+  - Body will be an error message
 - 404: Either the project or image requested does not exist.
   - Body message will contain either: "Project does not exist" or "Post does not exist"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Add Image `POST` `/api/v1/project/[project_id]/image`
 
@@ -962,7 +993,9 @@ Body:
 The file object of the image being uploaded. Or
 
 ```typescript
-{link: string, alt: string}
+{
+  image: string;
+}
 ```
 
 if you are adding an external image link.
@@ -980,7 +1013,7 @@ Body:
   link: string;
   alt: string;
   storageRemaining: number; // In bytes
-} | undefined
+} | string
 ```
 
 Status:
@@ -990,11 +1023,16 @@ Status:
 - 400: Bad Request
   - If the Content-Type of this endpoint is not one of the above this will be returned.
   - If there are too few bytes remaining in the project's storage quota to upload this image.
+  - Body will be an error message.
 - 401: Unauthorized, the user's session token is missing or invalid
+  - Body will be an error message.
 - 403: The user is not a project contributor for the requested project or does not have the editor role.
+  - Body will be an error message.
 - 404: The requested project does not exist
+  - Body will be an error message.
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
+  - Body will be an error message.
 
 ### Update Image Alt Text `PUT` `/api/v1/project/[project_id]/image/[image_id]`
 
@@ -1025,8 +1063,8 @@ Body:
 
 ```typescript
 {
-  alt?: string;
-}
+  alt: string;
+} | string
 ```
 
 Status:
@@ -1034,11 +1072,11 @@ Status:
 - 200: Alt Text Updated Successfully
   - `alt` will reflect the updated alt text.
 - 401: The authentication token was not provided or was invalid
-  - `alt` will be undefined.
+  - Body will be an error message
 - 403: The user is not a contributor on the project or does not have the editor role.
-  - `alt` will be undefined.
+  - Body will be an error message
 - 404: The requested project or image could not be found
-  - `alt` will be undefined.
+  - Body will be an error message
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
 
@@ -1066,7 +1104,7 @@ Headers:
 Body:
 
 ```typescript
-{storageRemaining: number} | string | undefined
+{storageRemaining: number} | string
 ```
 
 Status:
@@ -1074,14 +1112,14 @@ Status:
 - 204: Image deleted successfully
   - `storageRemaining` will contain the updated storage remaining amount.
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor on the requested project or does not have the editor role.
-  - Body will be undefined
+  - Body will be an error message
 - 404: Either the project or image requested does not exist.
   - Body message will contain either: "Project does not exist" or "Post does not exist"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Add Link `POST` `/api/v1/project/[project_id]/link`
 
@@ -1109,7 +1147,9 @@ Body:
 ```typescript
 {
 id: string;
-} | undefined
+url: "";
+label: "";
+} | string
 ```
 
 Status:
@@ -1117,14 +1157,14 @@ Status:
 - 201: Created Successfully
   - Body will be populated with relevant info.
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor on the requested project or does not have the editor role
-  - Body will be undefined
+  - Body will be an error message
 - 404: The project does not exist
-  - Body will be undefined
+  - Body will be an error message
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Update Link `PUT` `/api/v1/project/[project_id]/link/[link_id]`
 
@@ -1168,14 +1208,14 @@ Status:
 - 200: Updated Successfully
   - Body will be populated with the updated link info.
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor on the requested project or does not have the editor role
-  - Body will be undefined
+  - Body will be an error message
 - 404: Either the project or the link specified does not exist
   - Body will say either "Project does not exist" or "Link does not exist"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Delete Link `DELETE` `/api/v1/project/[project_id]/link/[link_id]`
 
@@ -1201,7 +1241,7 @@ Headers:
 Body:
 
 ```typescript
-{ message: string } | undefined
+string | undefined;
 ```
 
 Status:
@@ -1209,14 +1249,14 @@ Status:
 - 200: Deleted Successfully
   - Body will be undefined
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor for the specified project or does not have the editor role.
-  - Body will be undefined
+  - Body will be an error message
 - 404: The project or link could not be found.
   - Message will say "Project does not exist" or "Link does not exist"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Add Question `POST` `/api/v1/project/[project_id]/question`
 
@@ -1252,18 +1292,36 @@ Status:
 - 201: Created Successfully
   - Body will be populated with relevant info.
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor on the requested project or does not have the editor role.
-  - Body will be undefined
+  - Body will be an error message
 - 404: The project does not exist
-  - Body will be undefined
+  - Body will be an error message
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Update Question `PUT` `/api/v1/project/[project_id]/question/[question_id]`
 
-Updates the prompt or response for a question belonging to a project. Can be called by all contributors to the specified project with the editor role.
+Updates the prompt or response for a question belonging to a project. Can be called by all contributors to the specified project with the editor role. The answer string will be HTML sanitized removing all tags that are not:
+
+```
+[
+"b",
+"i",
+"u",
+"sup",
+"sub",
+"em",
+"strong",
+"p",
+"ul",
+"ol",
+"li",
+"pre",
+"code",
+]
+```
 
 #### Request
 
@@ -1295,7 +1353,7 @@ Body:
   prompt: string;
   answer: string;
   id: string;
-} | string | undefined
+} | string
 ```
 
 Status:
@@ -1303,14 +1361,14 @@ Status:
 - 200: Updated Successfully
   - Body will be populated with the updated link info.
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor on the requested project or does not have the editor role.
-  - Body will be undefined
+  - Body will be an error message
 - 404: Either the project or the link specified does not exist
   - Body will say either "Project does not exist" or "Link does not exist"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Delete Question `DELETE` `/api/v1/project/[project_id]/question/[question_id]`
 
@@ -1336,7 +1394,7 @@ Headers:
 Body:
 
 ```typescript
-{ message: string } | undefined
+string | undefined;
 ```
 
 Status:
@@ -1344,14 +1402,14 @@ Status:
 - 200: Deleted Successfully
   - Body will be undefined
 - 401: The session token is missing or invalid.
-  - Body will be undefined
+  - Body will be an error message
 - 403: The user is not a contributor for the specified project or does not have the editor role.
-  - Body will be undefined
+  - Body will be an error message
 - 404: The project or link could not be found.
   - Message will say "Project does not exist" or "Question does not exist"
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - Body will be undefined
+  - Body will be an error message
 
 ### Set Course / Group `PUT` `/api/v1/project/[project_id]/course`
 
@@ -1369,7 +1427,7 @@ Body:
 
 ```typescript
 {
-  group: string;
+  group_id: string;
 }
 ```
 
@@ -1383,8 +1441,11 @@ Body:
 
 ```typescript
 {
-    group?: string
-}
+    group: {
+        id: string,
+        name:string
+    }
+} | string
 ```
 
 Status:
@@ -1392,11 +1453,11 @@ Status:
 - 200: Group Updated Successfully
   - group value will reflect the new group
 - 401: The authentication token was not provided or was invalid
-  - group value will be undefined
+  - Body will be an error message
 - 403: The user is not the owner of the project
-  - group value will be undefined
+  - Body will be an error message
 - 404: The requested project was not found
-  - group value will be undefined
+  - Body will be an error message
 - 429: Rate Limit Exceeded.
 - 500: Internal Server Error
-  - group value will be undefined
+  - Body will be an error message

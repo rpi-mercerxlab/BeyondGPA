@@ -37,7 +37,6 @@ export async function GET(
       },
     });
 
-
     if (!project || project.visibility === "DELETED") {
       return new Response(JSON.stringify({ project: undefined }), {
         status: 404,
@@ -89,6 +88,7 @@ export async function GET(
           id: project.thumbnail?.id,
         },
         questions: project.questionPrompts.map((q) => ({
+          // ! This map is redundant, consider removing it
           question: q.question,
           answer: q.answer,
           id: q.id,
