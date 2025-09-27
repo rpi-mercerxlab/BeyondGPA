@@ -13,7 +13,7 @@ export async function PUT(
   const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response(undefined, { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const json = await request.json();
@@ -38,10 +38,7 @@ export async function PUT(
     ALLOWED_ATTR: ["class"],
   });
 
-  if (
-    typeof sanitizedDescription !== "string" ||
-    sanitizedDescription.length > 5000
-  ) {
+  if (typeof sanitizedDescription !== "string") {
     return new Response("Invalid Description", { status: 400 });
   }
 
@@ -60,7 +57,7 @@ export async function PUT(
         (c) => c.email === session.user.email && c.role === "EDITOR"
       ) === false
     ) {
-      return new Response(undefined, { status: 403 });
+      return new Response("Forbidden", { status: 403 });
     }
 
     await prisma.project.update({
@@ -73,6 +70,6 @@ export async function PUT(
     });
   } catch (error) {
     console.error("Error updating project description:", error);
-    return new Response(undefined, { status: 500 });
+    return new Response("Internal Server Error", { status: 500 });
   }
 }

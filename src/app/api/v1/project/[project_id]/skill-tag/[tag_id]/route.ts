@@ -9,7 +9,7 @@ export async function POST(
   const { project_id, tag_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response(undefined, { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
   try {
@@ -25,16 +25,24 @@ export async function POST(
       return new Response("Project Not Found", { status: 404 });
     }
 
+    const tag = await prisma.skillTag.findUnique({
+      where: { id: tag_id },
+    });
+
+    if (!tag) {
+      return new Response("Skill Tag Not Found", { status: 404 });
+    }
+
     if (
       project.contributors.some(
         (c) => c.email === session.user.email && c.role === "EDITOR"
       ) === false
     ) {
-      return new Response(undefined, { status: 403 });
+      return new Response("Forbidden", { status: 403 });
     }
 
     if (project.skillTags.some((t) => t.id === tag_id)) {
-      return new Response(undefined, { status: 200 });
+      return new Response("Skill Tag Already Associated", { status: 200 });
     }
 
     await prisma.project.update({
@@ -60,7 +68,7 @@ export async function DELETE(
   const { project_id, tag_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response(undefined, { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
   try {
@@ -82,7 +90,7 @@ export async function DELETE(
         role: "EDITOR",
       }) === false
     ) {
-      return new Response(undefined, { status: 403 });
+      return new Response("Forbidden", { status: 403 });
     }
 
     if (project.skillTags.includes({ id: tag_id }) === false) {
@@ -103,6 +111,6 @@ export async function DELETE(
     return new Response(undefined, { status: 204 });
   } catch (error) {
     console.error("Error removing skill tag from project:", error);
-    return new Response(undefined, { status: 500 });
+    return new Response("Internal Server Error", { status: 500 });
   }
 }

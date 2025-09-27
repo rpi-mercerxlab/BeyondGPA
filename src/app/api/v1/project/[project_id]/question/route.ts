@@ -9,7 +9,7 @@ export async function POST(
   const { project_id } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
-    return new Response(undefined, { status: 401 });
+    return new Response("Unauthorized", { status: 401 });
   }
 
   try {

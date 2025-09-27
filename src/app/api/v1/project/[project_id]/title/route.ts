@@ -17,10 +17,7 @@ export async function PUT(
   const json = await request.json();
   const new_title = json.title;
   if (typeof new_title !== "string" || new_title.length > 100) {
-    return new Response(
-      JSON.stringify("Title must be less than 100 characters."),
-      { status: 400 }
-    );
+    return new Response(JSON.stringify({ title: undefined }), { status: 400 });
   }
 
   try {
