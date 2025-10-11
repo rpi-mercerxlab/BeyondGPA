@@ -26,7 +26,7 @@ A user should be able to:
 
 ### View User's Profile GET `/api/v1/user/[user_id]`
 
-Gets all information about the user's profile. Will return 404 if the specified user's profile is private and the caller is not the owner of the profile.
+Gets all information about the user's profile. Will return 404 if the specified user's profile is private and the caller is not the owner of the profile. If the caller is the owner of the profile, and the profile does not exist yet, a new empty profile will be created with as much information filled in as possible.
 
 #### Request
 
@@ -50,9 +50,11 @@ Body:
         firstName: string,
         lastName: string,
         degrees: {
+            institution: string,
             degreeType: string,
             degreeName: string,
-            graduationYear: number
+            startDate: string,
+            endDate: string
         }[],
         bio: string,
         description: string,
@@ -71,7 +73,8 @@ Body:
             startDate: string,
             ongoing: boolean,
             endDate: string,
-            description: string
+            description: string,
+            institution: string
         } [],
         visibility: "PUBLIC" | "PRIVATE",
         profilePictureLink: string,
@@ -83,14 +86,11 @@ Status Codes:
 
 - 200: OK
   - All fields will be populated with the correct values
-- 401: Unauthorized
-  - The caller is not a logged in user
-  - Body.message will be an error message
-- 403: Forbidden
-  - The user trying to make this request is not the user who owns the profile
-  - The body.message will be an error message
+- 201: CREATED
+  - The user calling this endpoint was calling for their own profile, and the user did not have a profile so one was created for them
+  - All fields will be populated with the minimum known information.
 - 404: Not Found
-  - The specified user was not found
+  - The specified user was not found, the profile does not exist, or the profile is hidden to other users
   - The body.message will be an error message
 - 429: Rate Limit Exceeded
   - The body.message will be an error message
