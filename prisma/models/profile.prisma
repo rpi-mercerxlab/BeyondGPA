@@ -1,0 +1,89 @@
+model Profile {
+    userId String @id
+    preferredFirstName String 
+    preferredLastName String
+    degrees Education[]
+    bio String @default("") @db.VarChar(400) // Limit to 400 characters, this is a short bio
+    description String @default("") @db.VarChar(5000) // Limit to 5000 characters, this is a longer, rich text description
+    professionalExperience ProfessionalExperience[]
+    researchExperience ResearchExperience[]
+    visibility ProfileVisibility @default(PUBLIC)
+    picture ProfilePicture?
+    links ProfileLink[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Education {
+    id String @id @default(cuid())
+    profile Profile @relation(fields: [profileId], references: [userId])
+    profileId String
+    institution String @default("Rensselaer Polytechnic Institute")
+    degreeType String @default("")
+    degreeName String @default("")
+    startDate DateTime
+    endDate DateTime
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model ProfessionalExperience {
+    id String @id @default(cuid())
+    profile Profile @relation(fields: [profileId], references: [userId])
+    profileId String
+    company String
+    position String
+    startDate DateTime
+    endDate DateTime?
+    ongoing Boolean @default(false)
+    description String @default("") @db.VarChar(5000) // Limit to 5000 characters, this is a longer, rich text description
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model ResearchExperience {
+    id String @id @default(cuid())
+    profile Profile @relation(fields: [profileId], references: [userId])
+    profileId String
+    projectTitle String
+    institution String
+    startDate DateTime
+    endDate DateTime?
+    ongoing Boolean @default(false)
+    description String @default("") @db.VarChar(5000) // Limit to 5000 characters, this is a longer, rich text description
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum ProfileVisibility {
+    PUBLIC
+    PRIVATE
+}
+
+model ProfilePicture {
+    id String @id @default(cuid())
+    profile Profile @relation(fields: [profileId], references: [userId])
+    profileId String @unique
+    imageType ProfileImageType @default(DEFAULT)
+    imageId String? // the image id in the MinIO bucket must be set if imageType is UPLOADED
+    imageUrl String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+enum ProfileImageType {
+    DEFAULT
+    LINK
+    UPLOADED
+}
+
+model ProfileLink {
+    id String @id @default(cuid())
+    profile Profile @relation(fields: [profileId], references: [userId])
+    profileId String
+    url String
+    label String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
