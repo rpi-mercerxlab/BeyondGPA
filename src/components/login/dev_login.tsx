@@ -13,7 +13,6 @@ export default function DevLogin() {
         const firstName = formData.get("firstName");
         const lastName = formData.get("lastName");
         const role = formData.get("eduScopedPersonAffiliation");
-        const department = formData.get("department");
         await fetch("/api/auth/dev-login", {
           method: "POST",
           headers: {
@@ -24,7 +23,6 @@ export default function DevLogin() {
             firstName,
             lastName,
             role,
-            department,
             email: `${rcsid}@rpi.edu`, 
           }),
         }).then((res) => {
