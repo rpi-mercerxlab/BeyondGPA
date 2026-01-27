@@ -9,7 +9,7 @@ ENV DATABASE_URL=${DATABASE_URL}
 
 COPY package*.json prisma ./
 # Install dependencies (use npm ci for reproducibility if you have package-lock.json)
-RUN npm ci
+RUN npm install
 
 
 # Copy rest of source
