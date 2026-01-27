@@ -22,6 +22,10 @@ services:
       STUDENT_PROJECT_BUCKET_NAME: ${STUDENT_PROJECT_BUCKET_NAME}
     ports:
       - "3000:3000"
+    depends_on:
+      - database
+      - minio
+      - migrate
   database:
     image: postgres:latest
     environment:

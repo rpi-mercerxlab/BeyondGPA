@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
-import { assert, profile } from "console";
 
 export default async function GET(
   req: Request,
