@@ -18,7 +18,14 @@ if [ -z "$RESTORE_FILE_PATH" ]; then
     exit 1
 fi
 
-# 3. Run the restore
+# 3. Verify the file actually exists before stopping services
+if [ ! -f "$RESTORE_FILE_PATH" ]; then
+    echo "Error: File $RESTORE_FILE_PATH not found!"
+    echo "Please ensure the backup file exists at the specified path"
+    exit 1
+fi
+
+# 4. Run the restore
 # We pass PGPASSWORD so pg_restore doesn't prompt for it
 cat "$RESTORE_FILE_PATH" | docker exec -i -e PGPASSWORD="$POSTGRES_PASSWORD" $CONTAINER_NAME \
   pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --clean --if-exists --no-owner --role="$POSTGRES_USER"
