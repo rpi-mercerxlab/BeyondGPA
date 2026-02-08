@@ -9,18 +9,21 @@ else
     exit 1
 fi
 
-# 2. Configuration (Using the variable names from your .env)
-# Replace POSTGRES_USER etc. with whatever names you actually use in your file
-CONTAINER_NAME="beyondgpa-database-1"
-BACKUP_PATH="./backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-FILENAME="backup_${POSTGRES_DB}_${TIMESTAMP}.dump"
+BACKUP_DIR="$BACKUP_DIR/$TIMESTAMP"
+mkdir -p "$BACKUP_DIR"
 
-mkdir -p $BACKUP_PATH
+echo "Starting backups for $TIMESTAMP..."
 
-# 3. Run the backup
-# We pass PGPASSWORD so pg_dump doesn't prompt for it
-docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" $CONTAINER_NAME \
-  pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRES_DB" > "$BACKUP_PATH/$FILENAME"
+# 2. Postgres Backup (Logical Dump)
+docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" "$POSTGRES_CONTAINER_NAME" \
+  pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRES_DB" > "$BACKUP_DIR/db_backup.dump"
 
-echo "Backup created at $BACKUP_PATH/$FILENAME"
+# 3. MinIO Backup (Volume Archive)
+# Note: We use 'docker-compose_minio_data' or whatever 'docker volume ls' shows
+docker run --rm \
+  -v "$MINIO_VOLUME_NAME":/source_data:ro \
+  -v "$BACKUP_DIR":/target \
+  alpine tar -czf /target/minio_files.tar.gz -C /source_data .
+
+echo "Backups completed in $BACKUP_DIR"
