@@ -1,0 +1,3 @@
+Down Detector: 0 3,9,15,21 * * * python3 /beyondgpa/BeyondGPA/scripts/down-detector/cronjob.py
+Backup: 0 3 * * * bash /beyondgpa/BeyondGPA/scripts/backup/backup.sh
+Remove Stale Backups: 5 3 * * * bash /beyondgpa/BeyondGPA/scripts/backup/remove-stale-backups.sh -d
