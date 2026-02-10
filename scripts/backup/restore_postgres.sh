@@ -11,7 +11,7 @@ fi
 
 # 2. Configuration (Using the variable names from your .env)
 # Replace POSTGRES_USER etc. with whatever names you actually use in your file
-CONTAINER_NAME="beyondgpa-database-1"
+CONTAINER_NAME="$POSTGRES_CONTAINER_NAME"
 RESTORE_FILE_PATH="$1"
 if [ -z "$RESTORE_FILE_PATH" ]; then
     echo "Usage: $0 <path_to_backup_file>"
