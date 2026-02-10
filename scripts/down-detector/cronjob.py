@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     sent_time = time(hour=9, minute=0)  # Set the time for the sanity check (9:00 AM)
     current_time = datetime.now()
-    if current_time.hour == sent_time.hour and current_time.minute == sent_time.minute:
+    if current_time.hour == sent_time.hour:
         for receiver in receiver_emails:
             sanity_check(sender_email, receiver, password)
     
