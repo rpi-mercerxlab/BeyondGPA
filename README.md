@@ -73,7 +73,11 @@ The NextJS Live Server allows us to modify the UI and backend and see those chan
 
     - This allows us to access the database outside the docker container. If you want to run the app from the docker image again, you will have to change the line back.
 
-5. Run the NextJS live server:
+5. Generate the Prisma Client
+    
+        npx prisma generate
+
+6. Run the NextJS live server:
     
         npm run dev
 

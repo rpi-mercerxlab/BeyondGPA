@@ -10,7 +10,6 @@ declare module "next-auth" {
       lastName: string;
       role: string;
       rcsid?: string | null;
-      department?: string | null;
     };
   }
 
@@ -22,7 +21,6 @@ declare module "next-auth" {
     email: string;
     role: string;
     emailVerified?: string | null;
-    department?: string | null;
   }
 }
 
@@ -34,6 +32,5 @@ declare module "next-auth/jwt" {
     lastName: string;
     role: string;
     rcsid?: string | null;
-    department?: string | null;
   }
 }
