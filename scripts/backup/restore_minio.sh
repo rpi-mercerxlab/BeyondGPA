@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
 # 1. Load variables from .env file
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f $1 ]; then
+    export $(grep -v '^#' $1 | xargs)
 else
-    echo "Error: .env file not found!"
+    echo "Please specify a .env file with the arguments: $0 <path to .env> <path to backup.tar.gz>"
     exit 1
 fi
 
 # 2. Check if a filename was provided
-if [ -z "$1" ]; then
-    echo "Usage: $0 <backup_filename.tar.gz>"
+if [ -z "$2" ]; then
+    echo "Usage: $0 <path to .env> <backup_filename.tar.gz>"
     echo "Note: Script looks inside $BACKUP_DIR"
     exit 1
 fi
 
-BACKUP_FILE="$1"
+BACKUP_FILE="$2"
 # If the user just provides a filename, we assume it's in BACKUP_DIR. If they provide a path, we use should use that directly.
 if [[ "$BACKUP_FILE" == "$BACKUP_DIR"/* ]]; then
     FULL_PATH="$BACKUP_FILE"
