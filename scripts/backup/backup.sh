@@ -2,10 +2,10 @@
 
 # 1. Load variables from .env file
 # This reads the .env file and exports any line that isn't a comment
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f $1 ]; then
+    export $(grep -v '^#' $1 | xargs)
 else
-    echo ".env file not found!"
+    echo "Please specify a .env file with the arguments: $0 <path to .env>"
     exit 1
 fi
 
