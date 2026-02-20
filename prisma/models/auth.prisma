@@ -10,7 +10,7 @@ model User {
     accounts Account[]
     sessions Session[]
 
-    // Additional fields can be added later as needed
+    // Application-specific user profile model
     ownedProjects Project[] @relation("owner")
     contributions Contributor[]
 
