@@ -25,7 +25,6 @@ services:
     depends_on:
       - database
       - minio
-      - migrate
   database:
     image: postgres:18
     environment:

@@ -3,7 +3,7 @@ import BeyondLink from "@/components/common/BeyondComponents/BeyondLink";
 import Footer from "@/components/common/footer";
 import Header from "@/components/common/header/header";
 import { authOptions } from "@/lib/authentication/auth";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ArrowLeft } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
@@ -66,7 +66,7 @@ export default async function ProjectView({
   if (
     projectData.visibility === "DRAFT" &&
     !projectData.contributors.some(
-      (contributor) => contributor.email === session?.user.email
+      (contributor) => contributor.email === session?.user.email,
     )
   ) {
     redirect("/404");
@@ -74,7 +74,8 @@ export default async function ProjectView({
 
   const canEdit = projectData.contributors.some(
     (contributor) =>
-      contributor.email === session?.user.email && contributor.role === "EDITOR"
+      contributor.email === session?.user.email &&
+      contributor.role === "EDITOR",
   );
 
   return (

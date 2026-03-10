@@ -1,9 +1,9 @@
-import 'dotenv/config'
-import { defineConfig, env } from 'prisma/config'
+import 'dotenv/config';
+import { defineConfig, env } from 'prisma/config';
 
 export default defineConfig({
   // the main entry for your schema
-  schema: 'prisma/schema.prisma',
+  schema: 'prisma/',
   // where migrations should be generated
   // what script to run for "prisma db seed"
   migrations: {
@@ -14,4 +14,4 @@ export default defineConfig({
     url: env('DATABASE_URL'),
     shadowDatabaseUrl: env('SHADOW_DATABASE_URL')
   },
-})
+});
