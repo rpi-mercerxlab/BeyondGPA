@@ -1,5 +1,5 @@
 import { User } from "next-auth";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { randomUUID } from "crypto";
 
 export async function POST(request: Request) {

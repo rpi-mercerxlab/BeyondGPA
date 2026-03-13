@@ -3,7 +3,7 @@ import Header from "@/components/common/header/header";
 import ContributorProjectEdit from "@/components/ProjectEdit/ContributorEdit";
 import OwnerProjectEdit from "@/components/ProjectEdit/OwnerProjectEdit";
 import { authOptions } from "@/lib/authentication/auth";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { StudentProject } from "@/types/student_project";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";

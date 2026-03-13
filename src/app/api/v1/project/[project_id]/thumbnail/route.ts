@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/authentication/auth";
 import { minioClient } from "@/lib/minio";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import QuotaStream from "@/lib/quota-stream";
 import { getServerSession } from "next-auth";
 import { randomUUID } from "node:crypto";

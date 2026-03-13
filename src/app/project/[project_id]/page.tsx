@@ -3,7 +3,7 @@ import BeyondLink from "@/components/common/BeyondComponents/BeyondLink";
 import Footer from "@/components/common/footer";
 import Header from "@/components/common/header/header";
 import { authOptions } from "@/lib/authentication/auth";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { ArrowLeft } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Link from "next/link";

@@ -1,5 +1,5 @@
 import { authOptions } from "@/lib/authentication/auth";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { randomUUID } from "node:crypto";
 
