@@ -6,9 +6,9 @@ export default function ProfessionalExperienceList({
   experiences: ProfessionalExperience[];
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-11/12">
       {experiences.map((experience, index) => (
-        <div key={index} className="border p-4 rounded-lg">
+        <div key={index} className="rounded-lg">
           <h3 className="text-lg font-semibold">{experience.title}</h3>
           <h4>{experience.company}</h4>
           <p className="text-sm text-gray-600">

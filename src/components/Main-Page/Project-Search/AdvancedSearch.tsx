@@ -131,22 +131,24 @@ export default function AdvancedSearch({
             />
           </svg>
         </button>
-        {session && session.user.role === "student" && (
-          <BeyondButton
-            onClick={() => createNewProject()}
-            className="text-base h-8 flex items-center"
-          >
-            Create New Project
-          </BeyondButton>
-        )}
-        {session && session.user.role === "student" && (
-          <BeyondLink
-            href={`/user/${session.user.id}/#drafts`}
-            className="text-base h-8 flex items-center"
-          >
-            Your Draft Projects
-          </BeyondLink>
-        )}
+        <div className="flex space-x-2">
+          {session && session.user.role === "student" && (
+            <BeyondLink
+              href={`/user/${session.user.id}/#drafts`}
+              className="text-base h-8 flex items-center"
+            >
+              Your Draft Projects
+            </BeyondLink>
+          )}
+          {session && session.user.role === "student" && (
+            <BeyondButton
+              onClick={() => createNewProject()}
+              className="text-base h-8 flex items-center"
+            >
+              Create New Project
+            </BeyondButton>
+          )}
+        </div>
       </div>
       {projectCreateError && (
         <div className="text-red-500 text-sm my-0.5">

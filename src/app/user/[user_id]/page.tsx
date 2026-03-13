@@ -10,6 +10,8 @@ import ProfessionalExpereinceList from "@/components/UserProfiles/ProfessionalEx
 import ResearchExperienceList from "@/components/UserProfiles/ResearchExperienceList";
 import ProjectList from "@/components/UserProfiles/ProjectList";
 import { UserProfile } from "@/types/user_profiles";
+import BeyondButtonLink from "@/components/common/BeyondComponents/BeyondButtonLink";
+import BeyondLink from "@/components/common/BeyondComponents/BeyondLink";
 
 export default async function Page({
   params,
@@ -87,11 +89,10 @@ export default async function Page({
       },
       {
         label: "GitHub",
-        url: "https://github.com"
+        url: "https://github.com",
       },
     ],
   };
-
 
   // If the profile doesn't exist or is private and the current user is not the owner, redirect to a not found page
   // if (
@@ -103,16 +104,17 @@ export default async function Page({
 
   // Render the user profile page with the fetched data
   return (
-    <div>
+    <div className="w-full">
       <Header />
-      <div>
-        <div>
+      <div className="flex flex-row w-full">
+        <div className="w-1/4 flex flex-col bg-bg-base-200 p-4 min-h-screen ">
           {/* Sidebar Information (e.g., contact info, links) can be added here) */}
-          <ProfilePicture />
+          <div className="w-full flex justify-center">
+            <ProfilePicture />
+          </div>
           <h1>
             {" "}
-            {userProfile.firstName}{" "}
-            {userProfile.lastName}{" "}
+            {userProfile.firstName} {userProfile.lastName}{" "}
           </h1>
           <p>{userProfile.bio}</p>
           <StyledHorizonalSeperator />
@@ -122,38 +124,32 @@ export default async function Page({
               <ul>
                 {userProfile.links.map((link, index) => (
                   <li key={index}>
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {link.label}
-                    </a>
+                    <BeyondLink className="text-2xl" href={link.url}>{link.label}</BeyondLink>
                   </li>
                 ))}
               </ul>
             </div>
           )}
         </div>
-        <div>
+        <div className="w-3/4 p-4">
           {/* Main Content (e.g., professional experience, research experience) can be added here) */}
           <h2>Who am I?</h2>
           <StyledHorizonalSeperator />
           <p>{userProfile.description}</p>
-          <div className="flex flex-row">
-            <div className="flex flex-col">
+          <div className="flex flex-row space-x-4">
+            <div className="flex flex-col w-1/3">
               <h2>Education</h2>
               <StyledHorizonalSeperator />
               <EducationList degrees={userProfile.degrees} />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col w-1/3">
               <h2>Professional Experience</h2>
               <StyledHorizonalSeperator />
               <ProfessionalExpereinceList
                 experiences={userProfile.professionalExperience}
               />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col w-1/3">
               <h2>Research Experience</h2>
               <StyledHorizonalSeperator />
               <ResearchExperienceList
@@ -167,7 +163,7 @@ export default async function Page({
           {/* Placeholder for projects, can be fetched similarly to profile data */}
           {isCurrentUser && (
             <>
-              <h2>Draft Projects (Only Visible to You)</h2>
+              <h2 id="drafts">Draft Projects (Only Visible to You)</h2>
               <StyledHorizonalSeperator />
               <ProjectList projects={[]} />{" "}
               {/* Placeholder for draft projects, can be fetched similarly to profile data */}

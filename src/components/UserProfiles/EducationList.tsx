@@ -2,9 +2,9 @@ import { Education } from "@/types/user_profiles";
 
 export default function EducationList({ degrees }: { degrees: Education[] }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-11/12">
       {degrees.map((degree, index) => (
-        <div key={index} className="border p-4 rounded-lg">
+        <div key={index} className=" rounded-lg">
           <h3 className="text-lg font-semibold">
             {degree.degreeType} {degree.degreeName}
           </h3>
