@@ -100,7 +100,7 @@ export default async function ProjectEdit({
 
   const isOwner = project.owner.email === session.user.email;
   const canEdit = project.contributors.some(
-    (c) => c.email === session.user.email && c.role === "EDITOR"
+    (c) => c.email === session.user.email && c.role === "EDITOR",
   );
 
   return (

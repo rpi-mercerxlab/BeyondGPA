@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define the target directory and the age limit
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f $1 ]; then
+    export $(grep -v '^#' $1 | xargs)
 else
-    echo ".env file not found!"
+    echo "Please specify a .env file with the arguments: $0 <path to .env>"
     exit 1
 fi
 
@@ -17,10 +17,10 @@ if [ ! -d "$TARGET_DIR" ]; then
   exit 1
 fi
 
-if [[ $1 != "-d" ]]; then 
+if [[ $2 != "-d" ]]; then 
     echo "Dry run: Listing directories older than $DAYS_OLD days in $TARGET_DIR"
     find "$TARGET_DIR" -mindepth 1 -maxdepth 1 -type d -mtime +$DAYS_OLD -exec ls -ld {} \;
-    echo "To actually delete these directories, run the script with the -d flag: $0 -d"
+    echo "To actually delete these directories, run the script with the -d flag: $0 <path to .env> -d"
     exit 0
 fi
 

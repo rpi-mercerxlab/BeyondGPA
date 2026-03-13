@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "^7.4.0",
     "@tiptap/extension-subscript": "^3.1.0",
     "@tiptap/extension-superscript": "^3.1.0",
     "@tiptap/react": "^3.1.0",
@@ -20,6 +22,7 @@
     "minio": "^8.0.5",
     "next": "^15.5.9",
     "next-auth": "^4.24.11",
+    "pg": "^8.20.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-router-dom": "^7.13.0",
@@ -32,9 +35,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
-    "prisma": "^6.13.0",
+    "prisma": "^7.4.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

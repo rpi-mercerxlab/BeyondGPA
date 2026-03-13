@@ -1,7 +1,17 @@
-import "dotenv/config";
-import path from "node:path";
-import type { PrismaConfig } from "prisma";
+import 'dotenv/config';
+import { defineConfig, env } from 'prisma/config';
 
-export default {
-  schema: path.join("prisma", ""),
-} satisfies PrismaConfig;
+export default defineConfig({
+  // the main entry for your schema
+  schema: 'prisma/',
+  // where migrations should be generated
+  // what script to run for "prisma db seed"
+  migrations: {
+    path: 'prisma/migrations',
+    seed: 'tsx prisma/seed.ts',
+  },
+  datasource: {
+    url: env('DATABASE_URL'),
+    shadowDatabaseUrl: env('SHADOW_DATABASE_URL')
+  },
+});

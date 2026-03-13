@@ -25,9 +25,8 @@ services:
     depends_on:
       - database
       - minio
-      - migrate
   database:
-    image: postgres:latest
+    image: postgres:18
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -36,16 +35,16 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
-  migrate:
-    image: node:22-slim
-    working_dir: /usr/src/app
-    volumes:
-      - .:/usr/src/app
-    command: npx prisma migrate deploy
+  dev_shadow_database:
+    image: postgres:18
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
-    depends_on:
-      - database
+      POSTGRES_USER: ${POSTGRES_SHADOW_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_SHADOW_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_SHADOW_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - shadow_postgres_data:/var/lib/postgresql  
   minio:
     image: quay.io/minio/minio:latest
     environment:
@@ -61,3 +60,4 @@ services:
 volumes:
   postgres_data:
   minio_data:
+  shadow_postgres_data:

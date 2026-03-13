@@ -2,19 +2,19 @@
 
 # 1. Load variables from .env file
 # This reads the .env file and exports any line that isn't a comment
-if [ -f .env ]; then
-    export $(grep -v '^#' .env | xargs)
+if [ -f $1 ]; then
+    export $(grep -v '^#' $1 | xargs)
 else
-    echo ".env file not found!"
+    echo "Please specify a .env file with the arguments: $0 <path to .env> <path to db.dump>"
     exit 1
 fi
 
 # 2. Configuration (Using the variable names from your .env)
 # Replace POSTGRES_USER etc. with whatever names you actually use in your file
 CONTAINER_NAME="$POSTGRES_CONTAINER_NAME"
-RESTORE_FILE_PATH="$1"
+RESTORE_FILE_PATH="$2"
 if [ -z "$RESTORE_FILE_PATH" ]; then
-    echo "Usage: $0 <path_to_backup_file>"
+    echo "Usage: $0 <path to .env> <path_to_backup_file>"
     exit 1
 fi
 

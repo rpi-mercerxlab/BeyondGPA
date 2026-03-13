@@ -1,7 +1,4 @@
-"use client";
-
-
-import BeyondButtonLink from "@/components/common/BeyondComponents/BeyondButtonLink";
+    import BeyondButtonLink from "@/components/common/BeyondComponents/BeyondButtonLink";
 import Footer from "@/components/common/footer";
 import Header from "@/components/common/header/header";
 

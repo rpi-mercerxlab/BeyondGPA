@@ -66,7 +66,7 @@ export default async function ProjectView({
   if (
     projectData.visibility === "DRAFT" &&
     !projectData.contributors.some(
-      (contributor) => contributor.email === session?.user.email
+      (contributor) => contributor.email === session?.user.email,
     )
   ) {
     redirect("/404");
@@ -74,7 +74,8 @@ export default async function ProjectView({
 
   const canEdit = projectData.contributors.some(
     (contributor) =>
-      contributor.email === session?.user.email && contributor.role === "EDITOR"
+      contributor.email === session?.user.email &&
+      contributor.role === "EDITOR",
   );
 
   return (
