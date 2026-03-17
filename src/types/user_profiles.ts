@@ -1,5 +1,6 @@
 export type UserProfile = {
         id: string,
+        rcsid: string,
         firstName: string,
         lastName: string,
         degrees: Education[],

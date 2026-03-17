@@ -1,3 +1,3 @@
 export default function StyledHorizonalSeperator() {
-  return <hr className="border-t border-primary my-4 border-2" />;
+  return <hr className="border-t border-primary my-2 border-2" />;
 }

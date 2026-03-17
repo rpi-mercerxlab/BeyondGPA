@@ -9,13 +9,13 @@ export default function ResearchExperienceList({
     <div className="space-y-4 w-11/12">
       {experiences.map((experience, index) => (
         <div key={index} className="rounded-lg">
-          <h3 className="text-lg font-semibold">{experience.title}</h3>
-          <h4>{experience.institution}</h4>
-          <p className="text-sm text-gray-600">
-            {experience.startDate} -{" "}
+          <h3 className="text-2xl font-semibold">{experience.title}</h3>
+          <h4 className="text-xl text-gray-600">{experience.institution}</h4>
+          <p className="text-lg text-gray-600">
+            {experience.startDate} to{" "}
             {!experience.ongoing ? experience.endDate! : "Present"}
           </p>
-          <p className="text-sm text-gray-500">{experience.description}</p>
+          <p className="text-md text-gray-500">{experience.description}</p>
         </div>
       ))}
     </div>

@@ -12,6 +12,7 @@ import ProjectList from "@/components/UserProfiles/ProjectList";
 import { UserProfile } from "@/types/user_profiles";
 import BeyondButtonLink from "@/components/common/BeyondComponents/BeyondButtonLink";
 import BeyondLink from "@/components/common/BeyondComponents/BeyondLink";
+import Sidebar from "@/components/UserProfiles/Sidebar";
 
 export default async function Page({
   params,
@@ -21,7 +22,23 @@ export default async function Page({
   const { user_id } = await params;
 
   const session = await getServerSession(authOptions);
-  let isCurrentUser = user_id === session?.user.id; // Check if the profile being viewed belongs to the current user
+
+  // Get the user_id from the RCSID
+  const user = await prisma.user.findUnique({
+    where: {
+      rcsid: user_id,
+    },
+    select: {
+      id: true,
+      email: true,
+    },
+  });
+
+  if (!user) {
+    redirect("/not-found");
+  }
+
+  let isCurrentUser = user.id === session?.user.id; // Check if the profile being viewed belongs to the current user
 
   // Fetch the user profile information from the database
   // const userProfile = await prisma.profile.findUnique({
@@ -41,7 +58,8 @@ export default async function Page({
   // });
 
   const userProfile: UserProfile = {
-    id: user_id,
+    id: user.id,
+    rcsid: user_id,
     firstName: "John",
     lastName: "Doe",
     bio: "Computer Science student at XYZ University.",
@@ -107,63 +125,46 @@ export default async function Page({
     <div className="w-full">
       <Header />
       <div className="flex flex-row w-full">
-        <div className="w-1/4 flex flex-col bg-bg-base-200 p-4 min-h-screen ">
-          {/* Sidebar Information (e.g., contact info, links) can be added here) */}
-          <div className="w-full flex justify-center">
-            <ProfilePicture />
-          </div>
-          <h1>
-            {" "}
-            {userProfile.firstName} {userProfile.lastName}{" "}
-          </h1>
-          <p>{userProfile.bio}</p>
-          <StyledHorizonalSeperator />
-          {userProfile.links.length > 0 && (
-            <div>
-              <h2>Links</h2>
-              <ul>
-                {userProfile.links.map((link, index) => (
-                  <li key={index}>
-                    <BeyondLink className="text-2xl" href={link.url}>{link.label}</BeyondLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        <Sidebar userProfile={userProfile} />
         <div className="w-3/4 p-4">
           {/* Main Content (e.g., professional experience, research experience) can be added here) */}
-          <h2>Who am I?</h2>
+          <h2 className="text-4xl font-bold text-primary">Who am I?</h2>
           <StyledHorizonalSeperator />
-          <p>{userProfile.description}</p>
+          <p className="text-xl mb-4">{userProfile.description}</p>
           <div className="flex flex-row space-x-4">
             <div className="flex flex-col w-1/3">
-              <h2>Education</h2>
+              <h2 className="text-3xl font-bold text-primary">Education</h2>
               <StyledHorizonalSeperator />
               <EducationList degrees={userProfile.degrees} />
             </div>
             <div className="flex flex-col w-1/3">
-              <h2>Professional Experience</h2>
+              <h2 className="text-3xl font-bold text-primary">
+                Professional Experience
+              </h2>
               <StyledHorizonalSeperator />
               <ProfessionalExpereinceList
                 experiences={userProfile.professionalExperience}
               />
             </div>
             <div className="flex flex-col w-1/3">
-              <h2>Research Experience</h2>
+              <h2 className="text-3xl font-bold text-primary">
+                Research Experience
+              </h2>
               <StyledHorizonalSeperator />
               <ResearchExperienceList
                 experiences={userProfile.researchExperience}
               />
             </div>
           </div>
-          <h2>Projects</h2>
+          <h2 className="text-3xl font-bold text-primary">Projects</h2>
           <StyledHorizonalSeperator />
           <ProjectList projects={[]} />{" "}
           {/* Placeholder for projects, can be fetched similarly to profile data */}
           {isCurrentUser && (
             <>
-              <h2 id="drafts">Draft Projects (Only Visible to You)</h2>
+              <h2 className="text-3xl font-bold text-primary" id="drafts">
+                Draft Projects (Only Visible to You)
+              </h2>
               <StyledHorizonalSeperator />
               <ProjectList projects={[]} />{" "}
               {/* Placeholder for draft projects, can be fetched similarly to profile data */}

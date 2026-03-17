@@ -134,7 +134,7 @@ export default function AdvancedSearch({
         <div className="flex space-x-2">
           {session && session.user.role === "student" && (
             <BeyondLink
-              href={`/user/${session.user.id}/#drafts`}
+              href={`/user/${session.user.rcsid}/#drafts`}
               className="text-base h-8 flex items-center"
             >
               Your Draft Projects
