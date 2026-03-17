@@ -7,8 +7,15 @@ import BeyondLink from "@/components/common/BeyondComponents/BeyondLink";
 import BeyondButton from "../common/BeyondComponents/BeyondButton";
 import { useState } from "react";
 import { Link } from "lucide-react";
+import BeyondButtonLink from "../common/BeyondComponents/BeyondButtonLink";
 
-export default function Sidebar({ userProfile }: { userProfile: UserProfile }) {
+export default function Sidebar({
+  userProfile,
+  isCurrentUser,
+}: {
+  userProfile: UserProfile;
+  isCurrentUser: Boolean;
+}) {
   const [shareToastContent, setShareToastContent] = useState<
     String | undefined
   >(undefined);
@@ -37,13 +44,32 @@ export default function Sidebar({ userProfile }: { userProfile: UserProfile }) {
       <div className="w-full flex justify-center">
         <ProfilePicture />
       </div>
-      <h1 className="text-5xl text-primary font-bold">
-        {userProfile.firstName} {userProfile.lastName}{" "}
-      </h1>
+      <div className="flex w-full justify-between items-center">
+        <h1 className="text-5xl text-primary font-bold">
+          {userProfile.firstName} {userProfile.lastName}
+        </h1>
+        {isCurrentUser && (
+          <BeyondButtonLink
+            href={`/user/${userProfile.rcsid}/edit`}
+            className="text-base h-8 flex items-center"
+          >
+            Edit Profile
+          </BeyondButtonLink>
+        )}
+      </div>
+
       <p className="text-2xl">{userProfile.bio}</p>
-      <BeyondButton onClick={handleShareProfile} className="text-xl mt-2">
-        Share this profile!
-      </BeyondButton>
+      {userProfile.visibility == "PUBLIC" ? (
+        <BeyondButton onClick={handleShareProfile} className="text-xl mt-2">
+          Share this profile!
+        </BeyondButton>
+      ) : (
+        <p>
+          {" "}
+          This profile is private. Only you, the owner, can view and share
+          it.{" "}
+        </p>
+      )}
       {shareToastContent && (
         <div className="bg-base-200 text-primary p-2 rounded-md mt-1">
           {shareToastContent}

@@ -125,7 +125,7 @@ export default async function Page({
     <div className="w-full">
       <Header />
       <div className="flex flex-row w-full">
-        <Sidebar userProfile={userProfile} />
+        <Sidebar userProfile={userProfile} isCurrentUser={isCurrentUser} />
         <div className="w-3/4 p-4">
           {/* Main Content (e.g., professional experience, research experience) can be added here) */}
           <h2 className="text-4xl font-bold text-primary">Who am I?</h2>
