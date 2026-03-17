@@ -35,32 +35,35 @@ export async function GET(
         }
 
         const resp = await prisma.project.findMany({
-        where: {
-            ownerId: user_id,
-        },
-        select: {
-            id: true,
-            title: true,
-            description: true,
-            visibility: true,
-            thumbnail: { select: { url: true, altText: true } },
-            contributors: {
-                select: { name: true },
-                orderBy: { createdAt: "asc" },
+            where: {
+                OR:[
+                    { ownerId: user_id },
+                    { contributors: { some: { userId: user_id } } }
+                ]
             },
-            skillTags: { select: { name: true } },
-            group: { select: { name: true } },
-        },
-        take: limit + 1,
-        cursor: nextToken ? { id: nextToken } : undefined,
-        orderBy: { createdAt: "desc" },
-        });
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                visibility: true,
+                thumbnail: { select: { url: true, altText: true } },
+                contributors: {
+                    select: { name: true },
+                    orderBy: { createdAt: "asc" },
+                },
+                skillTags: { select: { name: true } },
+                group: { select: { name: true } },
+            },
+            take: limit + 1,
+            cursor: nextToken ? { id: nextToken } : undefined,
+            orderBy: { createdAt: "desc" },
+            });
 
-        let newNextToken: string | undefined = undefined;
-        if (resp.length > limit) {
-        const nextItem = resp.pop();
-        newNextToken = nextItem?.id;
-        }
+            let newNextToken: string | undefined = undefined;
+            if (resp.length > limit) {
+            const nextItem = resp.pop();
+            newNextToken = nextItem?.id;
+            }
 
         const responseBody = {
             paginationToken: nextToken,
