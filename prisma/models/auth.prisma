@@ -1,7 +1,7 @@
 model User {
     // Authentication and user management model
     id         String @id @default(cuid())
-    rcsid      String? // RPI-specific identifier, can be null if not applicable
+    rcsid      String @unique
     firstName  String
     lastName   String
     email      String @unique
