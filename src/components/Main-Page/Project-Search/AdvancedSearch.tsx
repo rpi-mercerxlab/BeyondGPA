@@ -8,6 +8,7 @@ import KeywordSelector from "@/components/common/KeywordSelector";
 import TagSelector from "@/components/common/SkillTagSelector";
 import { Group, SkillTag } from "@/types/student_project";
 import CourseGroupSelector from "@/components/common/CourseGroupSelector";
+import BeyondLink from "@/components/common/BeyondComponents/BeyondLink";
 
 export default function AdvancedSearch({
   onSearch,
@@ -20,7 +21,7 @@ export default function AdvancedSearch({
 }) {
   const { data: session } = useSession();
   const [projectCreateError, setProjectCreateError] = useState<string | null>(
-    null
+    null,
   );
   const [error, setError] = useState<string | null>(null);
   const [advancedSearchEnabled, setAdvancedSearchEnabled] = useState(false);
@@ -85,7 +86,7 @@ export default function AdvancedSearch({
 
       if (resp.status === 500) {
         setProjectCreateError(
-          "An unexpected error occurred, if this happens again, please open an issue on GitHub."
+          "An unexpected error occurred, if this happens again, please open an issue on GitHub.",
         );
         return;
       }
@@ -130,14 +131,24 @@ export default function AdvancedSearch({
             />
           </svg>
         </button>
-        {session && session.user.role === "student" && (
-          <BeyondButton
-            onClick={() => createNewProject()}
-            className="text-base h-8 flex items-center"
-          >
-            Create New Project
-          </BeyondButton>
-        )}
+        <div className="flex space-x-2">
+          {session && session.user.role === "student" && (
+            <BeyondLink
+              href={`/user/${session.user.id}/#drafts`}
+              className="text-base h-8 flex items-center"
+            >
+              Your Draft Projects
+            </BeyondLink>
+          )}
+          {session && session.user.role === "student" && (
+            <BeyondButton
+              onClick={() => createNewProject()}
+              className="text-base h-8 flex items-center"
+            >
+              Create New Project
+            </BeyondButton>
+          )}
+        </div>
       </div>
       {projectCreateError && (
         <div className="text-red-500 text-sm my-0.5">
