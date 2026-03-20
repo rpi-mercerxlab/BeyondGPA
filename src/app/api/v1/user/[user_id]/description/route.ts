@@ -21,11 +21,11 @@ export async function PUT(
             },
         }); 
 
-        if (!session.user_id){
+        if (!session.user.id){
             return new Response("User not found", { status: 404 });
         }
 
-        if (session.user_id != user_id){
+        if (session.user.id != user_id){
             return new Response("Forbidden", { status: 403 });
         }
 
@@ -39,10 +39,10 @@ export async function PUT(
         
         const updatedBio = await prisma.profile.update({
             where: {
-                userID: user_id,
+                userId: user_id,
             },
             data: {
-                personalBio: bio,
+                bio: bio,
             }
         });
 

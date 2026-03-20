@@ -1,7 +1,6 @@
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authentication/auth";
-import { url } from "inspector/promises";
 
 export async function GET(
     request: Request,

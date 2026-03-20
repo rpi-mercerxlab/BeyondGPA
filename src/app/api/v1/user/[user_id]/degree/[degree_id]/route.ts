@@ -25,7 +25,7 @@ export async function PUT(
             },
         });
 
-        if (session.user_id !== user_id){
+        if (session.user.id !== user_id){
             return new Response("Forbidden", { status: 403 });
         }
         
@@ -33,12 +33,12 @@ export async function PUT(
             return new Response("Profile not found", { status: 404 });
         }
 
-        const updatedDegree = await prisma.degree.update({
+        const updatedDegree = await prisma.education.update({
             where: {
                 id: degree_id,
             },
             data: {
-                university: "Rensselaer Polytechnic Institute",
+                institution: "Rensselaer Polytechnic Institute",
                 degreeType: degreeType,
                 degreeName: degreeName,
                 startDate: startDate,
@@ -69,7 +69,7 @@ export async function DELETE(
             },
         });
         
-        if (session.user_id !== user_id){
+        if (session.user.id !== user_id){
             return new Response("Forbidden", { status: 403 });
         } 
 
@@ -77,7 +77,7 @@ export async function DELETE(
             return new Response("Profile not found", { status: 404 });
         }   
 
-        const deletedDegree = await prisma.degree.delete({
+        const deletedDegree = await prisma.education.delete({
             where: {
                 id: degree_id,
             },

@@ -43,7 +43,7 @@ export async function PUT(
                 );
         }
 
-        if (session.user_id !== profile.userId) {
+        if (session.user.id !== profile.userId) {
             return Response.json(  
                 {
                     statusCode: 403,
@@ -53,13 +53,13 @@ export async function PUT(
             );
         }
 
-        const updatedJob = await prisma.jobExperience.update({
+        const updatedJob = await prisma.professionalExperience.update({
             where: {
                 id: job_id,
             },
             data: {
                 company: company,
-                title: title,
+                position: title,
                 startDate: new Date(startDate),
                 ongoing: ongoing,
                 endDate: endDate ? new Date(endDate) : null,
@@ -113,11 +113,11 @@ export async function DELETE(
             return new Response("Profile not found", { status: 404 });
         }
 
-        if (session.user_id !== profile.userId) {
+        if (session.user.id !== profile.userId) {
             return new Response("Forbidden", { status: 403 });
         }
 
-        await prisma.jobExperience.delete({
+        await prisma.professionalExperience.delete({
             where: {
                 id: job_id,
             },

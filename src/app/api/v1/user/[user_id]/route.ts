@@ -4,7 +4,7 @@ import { authOptions } from "@/lib/authentication/auth";
 
 export default async function GET(
   req: Request,
-  { params }: { params: Promise<{ user_id: string }> }
+  { params }: { params: Promise<{ user_id: string }> },
 ) {
   const { user_id } = await params;
 
@@ -75,7 +75,7 @@ export default async function GET(
         statusCode: 404,
         profile: undefined,
       }),
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -93,7 +93,7 @@ export default async function GET(
         picture: {
           create: {
             imageUrl: `https://api.dicebear.com/9.x/identicon/svg?seed=${user.id}`,
-            imageType: "DEFAULT",
+            imageType: "LINK",
           },
         },
       },
@@ -140,7 +140,7 @@ export default async function GET(
         statusCode: 404,
         profile: undefined,
       }),
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -153,7 +153,7 @@ export default async function GET(
         statusCode: 500,
         profile: undefined,
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
 
