@@ -1,22 +1,35 @@
-import { authOptions } from "@/lib/authentication/auth";
-import { getServerSession } from "next-auth";
+import Header from "@/components/common/header/header";
+import ProfileMainItemsEditor from "@/components/ProfileEditor/main-items";
+import Sidebar from "@/components/ProfileEditor/sidebar";
+import { UserProfile } from "@/types/user_profiles";
+
+const defaultProfileData: UserProfile = {
+  bio: "",
+  description: "",
+  degrees: [],
+  firstName: "",
+  lastName: "",
+  id: "",
+  links: [],
+  professionalExperience: [],
+  researchExperience: [],
+  visibility: "PRIVATE",
+  profilePictureLink: "",
+  rcsid: "",
+};
 
 export default async function Page({
   params,
 }: {
   params: Promise<{ user_id: string }>;
 }) {
-  const { user_id } = await params;
-
-  const session = await getServerSession(authOptions);
-
-  let isCurrentUser = false;
-    // Should we display the edit profile button
-  if (session && session.user.id == user_id){
-    isCurrentUser = true;
-  }
-
-  // Get the user profile information
-
-
+  return (
+    <div className="w-full flex flex-col items-center justify-start min-h-screen">
+      <Header />
+      <div className="flex flex-row w-full grow shrink basis-auto">
+        <Sidebar />
+        <ProfileMainItemsEditor />
+      </div>
+    </div>
+  );
 }

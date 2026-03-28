@@ -39,7 +39,7 @@ export default function Sidebar({
   };
 
   return (
-    <div className="w-1/4 flex flex-col bg-bg-base-200 p-4 min-h-screen ">
+    <div className="w-1/4 flex flex-col bg-bg-base-200 p-4 grow shrink basis-auto ">
       {/* Sidebar Information (e.g., contact info, links) can be added here) */}
       <div className="w-full flex justify-center">
         <ProfilePicture />

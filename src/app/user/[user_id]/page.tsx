@@ -13,6 +13,7 @@ import { UserProfile } from "@/types/user_profiles";
 import BeyondButtonLink from "@/components/common/BeyondComponents/BeyondButtonLink";
 import BeyondLink from "@/components/common/BeyondComponents/BeyondLink";
 import Sidebar from "@/components/UserProfiles/Sidebar";
+import Footer from "@/components/common/footer";
 
 export default async function Page({
   params,
@@ -122,12 +123,11 @@ export default async function Page({
 
   // Render the user profile page with the fetched data
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col items-center justify-start min-h-screen">
       <Header />
-      <div className="flex flex-row w-full">
+      <div className="flex flex-row w-full grow shrink basis-auto">
         <Sidebar userProfile={userProfile} isCurrentUser={isCurrentUser} />
         <div className="w-3/4 p-4">
-          {/* Main Content (e.g., professional experience, research experience) can be added here) */}
           <h2 className="text-4xl font-bold text-primary">Who am I?</h2>
           <StyledHorizonalSeperator />
           <p className="text-xl mb-4">{userProfile.description}</p>
@@ -172,6 +172,7 @@ export default async function Page({
           )}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
