@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import { StarterKit } from "@tiptap/starter-kit";
 import Superscript from "@tiptap/extension-superscript";
 import Subscript from "@tiptap/extension-subscript";
 import TabHandler from "./tabHandler";
 import ToolbarButton from "./toolbarButton";
+import debounce from "lodash.debounce";
 import {
   Bold,
   Code,
@@ -23,16 +24,22 @@ import {
 
 interface RichTextEditorProps {
   content?: string;
-  onChange: (html: string) => void;
-  onBlur: () => void;
+  onDebouncedChange?: (html: string) => void;
 }
 
 export default function RichTextEditor({
   content = "",
-  onChange,
-  onBlur,
+  onDebouncedChange,
 }: RichTextEditorProps) {
   const [, forceUpdate] = useState({});
+
+  const debounceSave = useMemo(() => {
+    if (!onDebouncedChange) return null;
+
+    return debounce((html: string) => {
+      onDebouncedChange(html);
+    }, 500);
+  }, [onDebouncedChange]);
 
   const editor = useEditor({
     extensions: [
@@ -91,10 +98,7 @@ export default function RichTextEditor({
     },
 
     onUpdate({ editor }) {
-      onChange(editor.getHTML());
-    },
-    onBlur() {
-      onBlur();
+      debounceSave?.((editor.getHTML()));
     },
     immediatelyRender: false,
   });

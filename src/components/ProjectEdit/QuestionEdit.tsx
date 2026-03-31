@@ -4,6 +4,8 @@ import { useState } from "react";
 import RichTextEditor from "@/components/common/RichTextEditor/component";
 import BeyondButton from "../common/BeyondComponents/BeyondButton";
 import BeyondLineEdit from "../common/BeyondComponents/BeyondLineEdit";
+import { useParams } from "next/navigation";
+import { on } from "events";
 
 const prompts = [
   "What encouraged you to work on this project?",
@@ -49,6 +51,10 @@ export default function QuestionInput({
       }
     }
   };
+
+  const { project_id } = useParams();
+
+  const { question_id } = useParams();
 
   return (
     <div className="w-full mx-auto bg-bg-base-100 py-2 rounded-md">
@@ -105,14 +111,8 @@ export default function QuestionInput({
       </div>
       <RichTextEditor
         content={localAnswer}
-        onChange={(value) => {
-          setLocalAnswer(value);
-        }}
-        onBlur={async () => {
-          const resp = await onAnswerChange(localAnswer);
-          if (!resp.ok) {
-            setError(resp.message || "Failed to save answer");
-          }
+        onDebouncedChange={async (html) => {
+          onAnswerChange(html);
         }}
       />
     </div>

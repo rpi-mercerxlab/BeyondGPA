@@ -14,6 +14,7 @@ import RichTextEditor from "../common/RichTextEditor/component";
 import { useState } from "react";
 import QuestionInput from "./QuestionEdit";
 import BeyondLineEdit from "../common/BeyondComponents/BeyondLineEdit";
+import { useParams } from "next/navigation";
 
 export default function ContributorEditableItems({
   project,
@@ -30,7 +31,6 @@ export default function ContributorEditableItems({
   onAddLink,
   onLinkChange,
   onLinkDelete,
-  onDescriptionChange,
   onAddQuestion,
   onQuestionChange,
   onQuestionDelete,
@@ -64,9 +64,6 @@ export default function ContributorEditableItems({
   onAddLink: () => Promise<{ ok: boolean; message?: string }>;
   onLinkChange: (newLink: Link) => Promise<{ ok: boolean; message?: string }>;
   onLinkDelete: (linkId: string) => Promise<{ ok: boolean; message?: string }>;
-  onDescriptionChange: (
-    newDescription: string
-  ) => Promise<{ ok: boolean; message?: string }>;
   onAddQuestion: () => Promise<{ ok: boolean; message?: string }>;
   onQuestionChange: (
     newQuestion: QuestionPrompt
@@ -76,7 +73,7 @@ export default function ContributorEditableItems({
   ) => Promise<{ ok: boolean; message?: string }>;
 }) {
   const [description, setDescription] = useState(project.description);
-
+  const { project_id } = useParams();
 
   return (
     <div>
@@ -163,9 +160,15 @@ export default function ContributorEditableItems({
         Tell us about your project, the more detail the better.
       </h1>
       <RichTextEditor
-        onChange={setDescription}
         content={description}
-        onBlur={() => onDescriptionChange(description)}
+        onDebouncedChange={async (html) => {
+          const resp = await fetch(`/api/v1/project/${project_id}/description`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ description: html }),
+          });
+          return resp;
+        }}
       />
       <h1 className="text-xl font-bold text-primary w-full border-b border-primary pt-4 mb-1">
         Elaborate further: What did you learn, what challenges did you face, and
