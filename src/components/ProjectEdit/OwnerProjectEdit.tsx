@@ -348,16 +348,6 @@ export default function OwnerProjectEdit({
               }
               return resp;
             }}
-            onDescriptionChange={async (newDescription: string) => {
-              const resp = await updateDescription(project_id, newDescription);
-              if (resp.ok) {
-                updateProject((prev) => ({
-                  ...prev!,
-                  description: newDescription,
-                }));
-              }
-              return resp;
-            }}
             onAddQuestion={async () => {
               const resp = await createQuestion(project_id);
               if (resp.ok) {
