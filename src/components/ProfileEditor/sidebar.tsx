@@ -6,7 +6,7 @@ import LinksInput from "./LinksEditor";
 
 export default function ProfileEditorSidebar() {
   return (
-    <div className="w-1/4 flex flex-col bg-bg-base-200 p-4 grow shrink basis-auto ">
+    <div className="w-1/4 flex flex-col bg-bg-base-200 p-4 max-h-full overflow-y-auto ">
       <ProfilePictureEditor />
       <StyledHorizonalSeperator />
       <NameEditor />

@@ -11,6 +11,7 @@ interface ImageUploadProps {
   onAltChange: (altText: string) => Promise<{ ok: boolean; message?: string }>; // Called when caption changes
   onDelete: () => Promise<{ ok: boolean; message?: string }>; // Called when image is deleted
   onUrlChange: (url: string) => Promise<{ ok: boolean; message?: string }>; // Called when an external image URL is specified
+  className?: string; // Optional additional styling
 }
 
 export default function SingleImageUpload({
@@ -21,6 +22,7 @@ export default function SingleImageUpload({
   onAltChange,
   onDelete,
   onUrlChange,
+  className = "",
 }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(existingImage || null);
   const [altText, setAltText] = useState<string>(existingAlt);
@@ -70,7 +72,7 @@ export default function SingleImageUpload({
   };
 
   return (
-    <div className="flex flex-col space-y-2 w-full bg-bg-base-100 p-2">
+    <div className={`flex flex-col space-y-2 w-full bg-bg-base-100 p-2 ${className}`}>
       {error && (
         <div className="text-red-500 flex items-center space-x-2">
           <span className="bg-red-500 text-white w-4 h-4 rounded-full flex items-center justify-center mx-2">
