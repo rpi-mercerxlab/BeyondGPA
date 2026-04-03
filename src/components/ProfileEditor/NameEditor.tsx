@@ -11,7 +11,7 @@ export default function NameEditor() {
         onChange={() => {}}
         value=""
         placeholder="First Name"
-        className="w-full max-w-xs mb-4"
+        className="w-full max-w-xs mb-4 border-gray-900"
       />
 
       <label htmlFor="name" className="text-lg font-medium mb-2">
@@ -21,7 +21,7 @@ export default function NameEditor() {
         onChange={() => {}}
         value=""
         placeholder="Last Name"
-        className="w-full max-w-xs mb-4"
+        className="w-full max-w-xs mb-4 border-gray-900"
       />
 
       <label htmlFor="name" className="text-lg font-medium mb-2">
@@ -32,7 +32,7 @@ export default function NameEditor() {
         onChange={() => {}}
         value=""
         placeholder="A short bio about yourself"
-        className="w-full max-w-xs mb-4"
+        className="w-full max-w-xs mb-4 border-gray-900"
       />
     </div>
   );
