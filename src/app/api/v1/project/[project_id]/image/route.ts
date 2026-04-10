@@ -56,6 +56,13 @@ export async function POST(
         return new Response("Image data is required", { status: 400 });
       }
 
+      const result = await isValidImage(image);
+
+      if (!result.ok) {
+        console.warn("Invalid image:", result.reason, result.src);
+        return new Response("Invalid image URL", { status: 400 });
+      }
+
       const resp = await prisma.image.create({
         data: {
           projectId: project_id,
@@ -75,11 +82,11 @@ export async function POST(
       return new Response(JSON.stringify(responseBody), { status: 201 });
     }
 
-    if (
-      !acceptedImageTypes.includes(request.headers.get("Content-Type") || "")
-    ) {
-      return new Response("Unsupported Media Type", { status: 415 });
-    }
+    // if (
+    //   !acceptedImageTypes.includes(request.headers.get("Content-Type") || "")
+    // ) {
+    //   return new Response("Unsupported Media Type", { status: 415 });
+    // }
 
     if (!request.body) {
       return new Response("No Image Provided", { status: 400 });
@@ -147,5 +154,15 @@ export async function POST(
   } catch (error) {
     console.error("Error uploading image:", error);
     return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
+async function isValidImage(url: string) {
+  try {
+    const response = await fetch(url, { method: "HEAD"});
+    const contentType = response.headers.get("Content-Type") || "";
+    return { ok: true, src: url, reason: "" };
+  } catch (error) {
+    return { ok: false, src: url, reason: "Failed to fetch image" };
   }
 }
