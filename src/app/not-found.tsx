@@ -1,4 +1,4 @@
-"use client";
+    
 
 
 import BeyondButtonLink from "@/components/common/BeyondComponents/BeyondButtonLink";
