@@ -157,10 +157,18 @@ export async function POST(
   }
 }
 
-async function isValidImage(url: string) {
+async function isValidImage(url: string, timeout = 5000) {
   try {
-    const response = await fetch(url, { method: "HEAD"});
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const response = await fetch(url, { method: "HEAD", signal: controller.signal });
+
+    clearTimeout(timeoutId);
     const contentType = response.headers.get("Content-Type") || "";
+    if (!acceptedImageTypes.includes(contentType)) {
+      return { ok: false, src: url, reason: `Unsupported content type: ${contentType}` };
+    }
     return { ok: true, src: url, reason: "" };
   } catch (error) {
     return { ok: false, src: url, reason: "Failed to fetch image" };
