@@ -56,9 +56,16 @@ export async function POST(
       const reqJSON = await request.json();
       const image = reqJSON.image;
 
-      if (!image) {
-        return new Response("Image data is required", { status: 400 });
-      }
+    const result = await isValidImage(image);
+
+    if (!result.ok) {
+      console.warn("Invalid image:", result.reason, result.src);
+      return new Response("Invalid image URL", { status: 400 });
+    }
+
+    if (!image) {
+      return new Response("Image data is required", { status: 400 });
+    }
 
       const thumbnail = await prisma.project.update({
         where: {
@@ -323,5 +330,23 @@ export async function DELETE(
   } catch (error) {
     console.error(error);
     return new Response("Internal Server Error", { status: 500 });
+  }
+}
+
+async function isValidImage(url: string, timeout = 5000) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const response = await fetch(url, { method: "HEAD", signal: controller.signal });
+
+    clearTimeout(timeoutId);
+    const contentType = response.headers.get("Content-Type") || "";
+    if (!acceptedImageTypes.includes(contentType)) {
+      return { ok: false, src: url, reason: `Unsupported content type: ${contentType}` };
+    }
+    return { ok: true, src: url, reason: "" };
+  } catch (error) {
+    return { ok: false, src: url, reason: "Failed to fetch image" };
   }
 }

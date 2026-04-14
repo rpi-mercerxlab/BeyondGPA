@@ -1,5 +1,5 @@
 import { ImageStruct } from "@/types/student_project";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BeyondLineEdit from "./BeyondComponents/BeyondLineEdit";
 
 export default function MultiImageUpload({
@@ -46,6 +46,8 @@ export default function MultiImageUpload({
                 const result = await onDelete(image.id);
                 if (!result.ok) {
                   setError(result.message || "Delete failed");
+                } else {
+                  setError(null);
                 }
               }}
               title="Delete Image"
@@ -64,6 +66,8 @@ export default function MultiImageUpload({
                 const result = await onAltChange(image.id, value);
                 if (!result.ok) {
                   setError(result.message || "Alt text change failed");
+                } else {
+                  setError(null);
                 }
               }}
             />
@@ -82,8 +86,9 @@ export default function MultiImageUpload({
                 const result = await onUpload(file);
                 if (!result.ok) {
                   setError(result.message || "Upload failed");
+                } else {
+                  setError(null);
                 }
-                setError(null);
               }
             }}
           />
@@ -97,8 +102,9 @@ export default function MultiImageUpload({
               const result = await onLink(value);
               if (!result.ok) {
                 setError(result.message || "Linking image failed");
+              } else {
+                setError(null);
               }
-              setError(null);
             }
           }}
           value=""
