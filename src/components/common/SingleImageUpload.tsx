@@ -27,19 +27,21 @@ export default function SingleImageUpload({
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     const file = e.target.files?.[0];
     if (file) {
       const result = await onUpload(file);
       if (!result.ok) {
         setError(result.message || "Upload failed");
       } else {
-        setError(null);
         setPreview(result.url!);
       }
     }
   };
 
   const handleAltChange = async (value: string) => {
+    setError(null);
+    setAltText(value);
     const resp = await onAltChange(value);
     if (!resp.ok) {
       setError(resp.message || "Alt text change failed");
@@ -49,6 +51,7 @@ export default function SingleImageUpload({
   };
 
   const handleUrlChange = async (value: string) => {
+    setError(null);
     setPreview(value);
     const resp = await onUrlChange(value);
     if (!resp.ok) {
@@ -59,6 +62,7 @@ export default function SingleImageUpload({
   };
 
   const handleDelete = async () => {
+    setError(null);
     setAltText("");
     setPreview(null);
     const resp = await onDelete();

@@ -82,12 +82,6 @@ export async function POST(
       return new Response(JSON.stringify(responseBody), { status: 201 });
     }
 
-    // if (
-    //   !acceptedImageTypes.includes(request.headers.get("Content-Type") || "")
-    // ) {
-    //   return new Response("Unsupported Media Type", { status: 415 });
-    // }
-
     if (!request.body) {
       return new Response("No Image Provided", { status: 400 });
     }
