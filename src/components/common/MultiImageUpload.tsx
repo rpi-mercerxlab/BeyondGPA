@@ -70,6 +70,7 @@ export default function MultiImageUpload({
                   setError(null);
                 }
               }}
+              debounceDuration={1000}
             />
           </div>
         </div>
