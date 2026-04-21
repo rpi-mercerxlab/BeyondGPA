@@ -52,11 +52,12 @@ export default function SingleImageUpload({
 
   const handleUrlChange = async (value: string) => {
     setError(null);
-    setPreview(value);
     const resp = await onUrlChange(value);
     if (!resp.ok) {
       setError(resp.message || "URL change failed");
+      setPreview(null);
     } else {
+      setPreview(value);
       setError(null);
     }
   };
