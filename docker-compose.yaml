@@ -22,6 +22,7 @@ services:
       STUDENT_PROJECT_BUCKET_NAME: ${STUDENT_PROJECT_BUCKET_NAME}
     ports:
       - "3000:3000"
+    restart: unless-stopped
   database:
     image: postgres:18
     environment:
@@ -32,6 +33,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+    restart: unless-stopped
   dev_shadow_database:
     image: postgres:18
     environment:
@@ -53,6 +55,8 @@ services:
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
+    restart: unless-stopped
+    
 
 volumes:
   postgres_data:
